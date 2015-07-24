@@ -1,29 +1,29 @@
-package api.util;
+package api.account;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import dao.DbUtil;
+import api.ret.obj.ApiRet;
+import api.ret.obj.ErrMsg;
+import api.ret.obj.RetCode;
+import bll.BizUtil;
+import net.sf.json.JSONObject;
 
 /**
- * Servlet implementation class Signup
+ * Servlet implementation class ResetLoginPwd
  */
-@WebServlet("/api/util/signup")
-public class Signup extends HttpServlet {
+@WebServlet("/api/account/resetLoginPwd")
+public class ResetLoginPwd extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public Signup() {
+    public ResetLoginPwd() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -32,21 +32,18 @@ public class Signup extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		response.getWriter().append("Served at: ").append(request.getContextPath()).append("123");
+
+		String telephone = request.getParameter("telephone");
+		String newPassword = request.getParameter("newPassword");
 		
-		DbUtil dbUtil = new DbUtil();
-		try {
-			Connection conn = dbUtil.getConnection();
-			Statement stmt = conn.createStatement();
-			String sql = "SELECT * FROM huiwan.account";
-			ResultSet rs = stmt.executeQuery(sql);
-			while(rs.next()) {
-				System.out.println(rs.getString(2));
-			}
-		} catch (Exception e) {
-			System.out.println(e.getStackTrace());
-		}
+		BizUtil.resetLoginPwd(telephone, newPassword);
+		
+		ApiRet ret = new ApiRet();
+		ret.setCode(RetCode.SUCCESS);
+		ret.setData(new ErrMsg());
+		
+		JSONObject jsonObject = JSONObject.fromObject(ret);
+		response.getWriter().append(jsonObject.toString());
 	}
 
 	/**
