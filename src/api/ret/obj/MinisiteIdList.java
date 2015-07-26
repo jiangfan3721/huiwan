@@ -2,7 +2,7 @@ package api.ret.obj;
 
 import java.util.ArrayList;
 
-public class MinisiteList extends RetObjBase {
+public class MinisiteIdList extends RetObjBase {
 	
 	ArrayList<Long> minisiteIdList;
 

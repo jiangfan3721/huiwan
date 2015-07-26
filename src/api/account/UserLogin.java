@@ -8,12 +8,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import api.ret.obj.ApiRet;
 import api.ret.obj.ErrMsg;
 import api.ret.obj.RetCode;
 import api.ret.obj.Uid;
 import bll.BizUtil;
-import net.sf.json.JSONObject;
+import bll.HttpUtil;
 
 /**
  * Servlet implementation class UserLogin
@@ -36,22 +35,32 @@ public class UserLogin extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 		String telephone = request.getParameter("telephone");
-		String loginPassword = request.getParameter("loginPassword");
+		String password = request.getParameter("password");
 		
-		Uid uid = BizUtil.userLogin(telephone, loginPassword);
-		
-		ApiRet ret = new ApiRet();
-		
-		if (uid.getUid() < 0) {
-			ret.setCode(RetCode.NOT_FOUND);
-			ret.setData(new ErrMsg());
-		} else {
-			ret.setCode(RetCode.SUCCESS);
-			ret.setData(uid);
+		if (telephone == null || telephone.isEmpty()) {
+			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, 
+					ErrMsg.TELEPHONE_NULL);
+			return;
 		}
 		
-		JSONObject jsonObject = JSONObject.fromObject(ret);
-		response.getWriter().append(jsonObject.toString());
+		if (password == null || password.isEmpty()) {
+			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, 
+					ErrMsg.PASSWORD_NULL);
+			return;
+		}
+		
+		if (!BizUtil.checkUser(telephone)) {
+			HttpUtil.errorRespond(response, RetCode.NOT_FOUND, 
+					ErrMsg.USER_NOT_EXIST);
+			return;
+		}
+		
+		Uid uid = BizUtil.userLogin(telephone, password);
+		if (uid.getUid() < 0) {
+			HttpUtil.errorRespond(response, RetCode.NOT_FOUND, ErrMsg.PASSWORD_NOT_CORRET);
+		} else {
+			HttpUtil.normalRespond(response, RetCode.SUCCESS, uid);
+		}
 	}
 
 	/**

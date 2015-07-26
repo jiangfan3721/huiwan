@@ -7,11 +7,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import api.ret.obj.ApiRet;
 import api.ret.obj.ErrMsg;
 import api.ret.obj.RetCode;
 import bll.BizUtil;
-import net.sf.json.JSONObject;
+import bll.HttpUtil;
 
 /**
  * Servlet implementation class ResetLoginPwd
@@ -36,14 +35,27 @@ public class ResetLoginPwd extends HttpServlet {
 		String telephone = request.getParameter("telephone");
 		String newPassword = request.getParameter("newPassword");
 		
+		if (telephone == null || telephone.isEmpty()) {
+			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, 
+					ErrMsg.TELEPHONE_NULL);
+			return;
+		}
+		
+		if (newPassword == null || newPassword.isEmpty()) {
+			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, 
+					ErrMsg.PASSWORD_NULL);
+			return;
+		}
+		
+		if (!BizUtil.checkUser(telephone)) {
+			HttpUtil.errorRespond(response, RetCode.NOT_FOUND, 
+					ErrMsg.USER_NOT_EXIST);
+			return;
+		}
+		
 		BizUtil.resetLoginPwd(telephone, newPassword);
 		
-		ApiRet ret = new ApiRet();
-		ret.setCode(RetCode.SUCCESS);
-		ret.setData(new ErrMsg());
-		
-		JSONObject jsonObject = JSONObject.fromObject(ret);
-		response.getWriter().append(jsonObject.toString());
+		HttpUtil.normalRespond(response, RetCode.SUCCESS, null);
 	}
 
 	/**

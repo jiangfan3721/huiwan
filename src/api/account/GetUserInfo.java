@@ -7,12 +7,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import api.ret.obj.ApiRet;
 import api.ret.obj.ErrMsg;
 import api.ret.obj.RetCode;
 import api.ret.obj.UserInfo;
 import bll.BizUtil;
-import net.sf.json.JSONObject;
+import bll.HttpUtil;
 
 /**
  * Servlet implementation class GetUserInfo
@@ -36,31 +35,22 @@ public class GetUserInfo extends HttpServlet {
 
 		String uidStr = request.getParameter("uid");
 		long uid = -1;
-		ApiRet ret = new ApiRet();
 		
 		try {
 			uid = Long.parseLong(uidStr);
 		} catch (NumberFormatException e) {
 			System.out.println("Error while parse " + uidStr + " to long");
-			ret.setCode(RetCode.BAD_REQUEST);
-			ret.setData(new ErrMsg());
-			JSONObject jsonObject = JSONObject.fromObject(ret);
-			response.getWriter().append(jsonObject.toString());
+			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, ErrMsg.NUMBER_FORMAT_ERROR);
 			return;
 		}
 		
 		UserInfo userInfo = BizUtil.getUserInfo(uid);
 		
 		if (userInfo != null) {
-			ret.setCode(RetCode.SUCCESS);
-			ret.setData(userInfo);
+			HttpUtil.normalRespond(response, RetCode.SUCCESS, userInfo);
 		} else {
-			ret.setCode(RetCode.NOT_FOUND);
-			ret.setData(new ErrMsg());
+			HttpUtil.errorRespond(response, RetCode.NOT_FOUND, ErrMsg.USER_NOT_EXIST);
 		}
-		
-		JSONObject jsonObject = JSONObject.fromObject(ret);
-		response.getWriter().append(jsonObject.toString());
 	}
 
 	/**

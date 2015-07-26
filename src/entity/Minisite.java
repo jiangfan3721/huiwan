@@ -1,37 +1,41 @@
 package entity;
 
-import java.sql.Timestamp;
-import java.util.Date;
-
-
 public class Minisite {
 
+	private long minisiteId;
 	private long siteId;
-	private long destinationId;
 	private String name;
 	private String logoPath;
 	private String address;
-	private String picPath;
 	private String descPath;
 	private float coorsX;
 	private float coorsY;
 	private String keyValue;
 	private String musicPath;
 	private String ircPath;
+	private String englishName;
 	
 	public Minisite(){
+		this.minisiteId = -1;
 		this.siteId = -1;
-		this.destinationId = -1;
 		this.name = "";
 		this.logoPath = "";
 		this.address = "";
-		this.picPath = "";
 		this.descPath = "";
 		this.coorsX = 0.0f;
 		this.coorsY = 0.0f;
 		this.keyValue = "";
 		this.ircPath = "";
 		this.musicPath = "";
+		this.englishName = "";
+	}
+
+	public long getMinisiteId() {
+		return minisiteId;
+	}
+
+	public void setMinisiteId(long minisiteId) {
+		this.minisiteId = minisiteId;
 	}
 
 	public long getSiteId() {
@@ -40,14 +44,6 @@ public class Minisite {
 
 	public void setSiteId(long siteId) {
 		this.siteId = siteId;
-	}
-
-	public long getDestinationId() {
-		return destinationId;
-	}
-
-	public void setDestinationId(long destinationId) {
-		this.destinationId = destinationId;
 	}
 
 	public String getName() {
@@ -72,14 +68,6 @@ public class Minisite {
 
 	public void setAddress(String address) {
 		this.address = address;
-	}
-
-	public String getPicPath() {
-		return picPath;
-	}
-
-	public void setPicPath(String picPath) {
-		this.picPath = picPath;
 	}
 
 	public String getDescPath() {
@@ -129,6 +117,13 @@ public class Minisite {
 	public void setIrcPath(String ircPath) {
 		this.ircPath = ircPath;
 	}
-	
+
+	public String getEnglishName() {
+		return englishName;
+	}
+
+	public void setEnglishName(String englishName) {
+		this.englishName = englishName;
+	}
 	
 }

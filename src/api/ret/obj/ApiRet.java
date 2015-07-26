@@ -4,6 +4,17 @@ public class ApiRet {
 	
 	private int code;
 	private RetObjBase data;
+	
+	public ApiRet() {
+		super();
+		this.code = RetCode.NULL;
+	}
+	
+	public ApiRet(int code, RetObjBase data) {
+		super();
+		this.code = code;
+		this.data = data;
+	}
 		
 	public int getCode() {
 		return code;

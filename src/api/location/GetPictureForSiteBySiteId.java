@@ -1,4 +1,4 @@
-package api.account;
+package api.location;
 
 import java.io.IOException;
 import javax.servlet.ServletException;
@@ -8,21 +8,22 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import api.ret.obj.ErrMsg;
+import api.ret.obj.PicturePathList;
 import api.ret.obj.RetCode;
 import bll.BizUtil;
 import bll.HttpUtil;
 
 /**
- * Servlet implementation class DeleteMinisiteCollect
+ * Servlet implementation class GetPictureForSiteBySiteId
  */
-@WebServlet("/api/account/deleteMinisiteCollect")
-public class DeleteMinisiteCollect extends HttpServlet {
+@WebServlet("/api/location/getPictureForSiteBySiteId")
+public class GetPictureForSiteBySiteId extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public DeleteMinisiteCollect() {
+    public GetPictureForSiteBySiteId() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -31,41 +32,26 @@ public class DeleteMinisiteCollect extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+		String siteIdStr = request.getParameter("siteId");
 		
-		String minisiteIdStr = request.getParameter("minisiteId");
-		String uidStr = request.getParameter("uid");
-		
-		if (minisiteIdStr == null || minisiteIdStr.isEmpty()) {
+		if (siteIdStr == null || siteIdStr.isEmpty()) {
 			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, 
-					ErrMsg.MINISITE_ID_NULL);
+					ErrMsg.SITE_ID_NULL);
 			return;
 		}
 		
-		if (uidStr == null || uidStr.isEmpty()) {
-			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, 
-					ErrMsg.UID_NULL);
-			return;
-		}
-		
-		long uid = -1, minisiteId = -1;
-		
+		long siteId = -1;
 		try {
-			uid = Long.parseLong(uidStr);
-			minisiteId = Long.parseLong(minisiteIdStr);
+			siteId = Long.parseLong(siteIdStr);
 		} catch (NumberFormatException e) {
-			System.out.println("Error while parse uid/minisiteId to long");
+			System.out.println("Error while parse " + siteIdStr + " to long.");
 			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, ErrMsg.NUMBER_FORMAT_ERROR);
 			return;
 		}
-		
-		if (!BizUtil.checkMinisiteCollect(minisiteId, uid)) {
-			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, 
-					ErrMsg.MINISITE_COLLECT_NOT_EXIST);
-			return;
-		}
-		
-		BizUtil.deleteMinisiteCollect(minisiteId, uid);
-		HttpUtil.normalRespond(response, RetCode.SUCCESS, null);
+
+		PicturePathList pathList = BizUtil.GetPictureForSiteBySiteId(siteId);
+		HttpUtil.normalRespond(response, RetCode.SUCCESS, pathList);
 	}
 
 	/**

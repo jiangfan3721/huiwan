@@ -7,11 +7,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import api.ret.obj.ApiRet;
 import api.ret.obj.CityList;
 import api.ret.obj.RetCode;
 import bll.BizUtil;
-import net.sf.json.JSONObject;
+import bll.HttpUtil;
 
 /**
  * Servlet implementation class GetCityList
@@ -35,13 +34,7 @@ public class GetCityList extends HttpServlet {
 
 		CityList cityList = BizUtil.getCityList();
 		
-		ApiRet ret = new ApiRet();
-		ret.setCode(RetCode.SUCCESS);
-		ret.setData(cityList);
-		
-		JSONObject jsonObject = JSONObject.fromObject(ret);
-		response.setHeader("Content-type", "text/html;charset=UTF-8");
-		response.getWriter().append(jsonObject.toString());
+		HttpUtil.normalRespond(response, RetCode.SUCCESS, cityList);
 	}
 
 	/**

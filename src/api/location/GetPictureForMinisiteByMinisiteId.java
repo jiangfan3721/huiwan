@@ -1,4 +1,4 @@
-package api.account;
+package api.location;
 
 import java.io.IOException;
 import javax.servlet.ServletException;
@@ -7,24 +7,23 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import api.ret.obj.ApiRet;
 import api.ret.obj.ErrMsg;
-import api.ret.obj.OptRetCode;
+import api.ret.obj.PicturePathList;
 import api.ret.obj.RetCode;
 import bll.BizUtil;
-import net.sf.json.JSONObject;
+import bll.HttpUtil;
 
 /**
- * Servlet implementation class Comment
+ * Servlet implementation class GetPictureForMinisiteByMinisiteId
  */
-@WebServlet("/api/account/comment")
-public class Comment extends HttpServlet {
+@WebServlet("/api/location/getPictureForMinisiteByMinisiteId")
+public class GetPictureForMinisiteByMinisiteId extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public Comment() {
+    public GetPictureForMinisiteByMinisiteId() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -35,35 +34,24 @@ public class Comment extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 		String minisiteIdStr = request.getParameter("minisiteId");
-		String desc = request.getParameter("desc");
-		String uidStr = request.getParameter("uid");
 		
-		long minisiteId = -1, uid = -1;
-		ApiRet ret = new ApiRet();
-		
-		try {
-			minisiteId = Long.parseLong(minisiteIdStr);
-			uid = Long.parseLong(uidStr);
-		} catch (NumberFormatException e) {
-			System.out.println("Error while parse minisiteId/uid to long");
-			ret.setCode(RetCode.BAD_REQUEST);
-			ret.setData(new ErrMsg());
-			JSONObject jsonObject = JSONObject.fromObject(ret);
-			response.getWriter().append(jsonObject.toString());
+		if (minisiteIdStr == null || minisiteIdStr.isEmpty()) {
+			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, 
+					ErrMsg.MINISITE_ID_NULL);
 			return;
 		}
 		
-		int optRet = BizUtil.comment(minisiteId, desc, uid);
-		if (optRet > 0) {
-			ret.setCode(RetCode.SUCCESS);
-			ret.setData(OptRetCode.getSuccRetCode());
-		} else {
-			ret.setCode(RetCode.NOT_FOUND);
-			ret.setData(OptRetCode.getFailRetCode());
+		long minisiteId = -1;
+		try {
+			minisiteId = Long.parseLong(minisiteIdStr);
+		} catch (NumberFormatException e) {
+			System.out.println("Error while parse " + minisiteIdStr + " to long.");
+			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, ErrMsg.NUMBER_FORMAT_ERROR);
+			return;
 		}
-		
-		JSONObject jsonObject = JSONObject.fromObject(ret);
-		response.getWriter().append(jsonObject.toString());
+
+		PicturePathList pathList = BizUtil.GetPictureForMinisiteByMinisiteId(minisiteId);
+		HttpUtil.normalRespond(response, RetCode.SUCCESS, pathList);
 	}
 
 	/**

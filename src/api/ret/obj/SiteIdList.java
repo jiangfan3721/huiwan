@@ -2,7 +2,7 @@ package api.ret.obj;
 
 import java.util.ArrayList;
 
-public class SiteList extends RetObjBase {
+public class SiteIdList extends RetObjBase {
 	
 	ArrayList<Long> siteIdList;
 

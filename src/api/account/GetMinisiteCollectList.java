@@ -7,12 +7,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import api.ret.obj.ApiRet;
 import api.ret.obj.ErrMsg;
-import api.ret.obj.MinisiteList;
+import api.ret.obj.MinisiteIdList;
 import api.ret.obj.RetCode;
 import bll.BizUtil;
-import net.sf.json.JSONObject;
+import bll.HttpUtil;
 
 /**
  * Servlet implementation class GetMinisiteCollectList
@@ -36,25 +35,24 @@ public class GetMinisiteCollectList extends HttpServlet {
 
 		String uidStr = request.getParameter("uid");
 		
-		long uid = -1;
-		ApiRet ret = new ApiRet();
+		if (uidStr == null || uidStr.isEmpty()) {
+			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, 
+					ErrMsg.UID_NULL);
+			return;
+		}
 		
+		long uid = -1;
 		try {
 			uid = Long.parseLong(uidStr);
 		} catch (NumberFormatException e) {
 			System.out.println("Error while parse " + uidStr + " to long.");
-			ret.setCode(RetCode.BAD_REQUEST);
-			ret.setData(new ErrMsg());
-			JSONObject jsonObject = JSONObject.fromObject(ret);
-			response.getWriter().append(jsonObject.toString());
+			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, ErrMsg.NUMBER_FORMAT_ERROR);
 			return;
 		}
-
-		MinisiteList minisiteList = BizUtil.getMinisiteCollectList(uid);
-		ret.setCode(RetCode.SUCCESS);
-		ret.setData(minisiteList);
-		JSONObject jsonObject = JSONObject.fromObject(ret);
-		response.getWriter().append(jsonObject.toString());
+		
+		MinisiteIdList minisiteIdList = BizUtil.getMinisiteCollectList(uid);
+		
+		HttpUtil.normalRespond(response, RetCode.SUCCESS, minisiteIdList);
 	}
 
 	/**

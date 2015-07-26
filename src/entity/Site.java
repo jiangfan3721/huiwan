@@ -1,42 +1,39 @@
 package entity;
 
-import java.sql.Timestamp;
-import java.util.Date;
-
 public class Site {
 	
-	private long destinationId;
+	private long siteId;
 	private String name;
 	private String logoPath;
 	private String address;
-	private String picPath;
 	private String rate;
 	private float coorsX;
 	private float coorsY;
 	private String keyValue;
 	private String descPath;
 	private long cityId;
+	private String englishName;
 	
 	public Site() {
-		this.destinationId = -1;
+		this.siteId = -1;
 		this.name = "";
 		this.logoPath = "";
 		this.address = "";
-		this.picPath = "";
 		this.rate = "";
 		this.coorsX = 0.0f;
 		this.coorsY = 0.0f;
 		this.keyValue = "";
 		this.descPath = "";
 		this.cityId = -1;
+		this.englishName = "";
 	}
 
-	public long getDestinationId() {
-		return destinationId;
+	public long getSiteId() {
+		return siteId;
 	}
 
-	public void setDestinationId(long destinationId) {
-		this.destinationId = destinationId;
+	public void setSiteId(long siteId) {
+		this.siteId = siteId;
 	}
 
 	public String getName() {
@@ -61,14 +58,6 @@ public class Site {
 
 	public void setAddress(String address) {
 		this.address = address;
-	}
-
-	public String getPicPath() {
-		return picPath;
-	}
-
-	public void setPicPath(String picPath) {
-		this.picPath = picPath;
 	}
 
 	public String getRate() {
@@ -117,6 +106,14 @@ public class Site {
 
 	public void setCityId(long cityId) {
 		this.cityId = cityId;
+	}
+
+	public String getEnglishName() {
+		return englishName;
+	}
+
+	public void setEnglishName(String englishName) {
+		this.englishName = englishName;
 	}
 	
 	

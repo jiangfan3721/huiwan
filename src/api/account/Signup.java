@@ -8,12 +8,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import api.ret.obj.ApiRet;
 import api.ret.obj.ErrMsg;
 import api.ret.obj.RetCode;
 import api.ret.obj.Uid;
 import bll.BizUtil;
-import net.sf.json.JSONObject;
+import bll.HttpUtil;
 
 /**
  * Servlet implementation class Signup
@@ -36,24 +35,46 @@ public class Signup extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 		String telephone = request.getParameter("telephone");
-		String password = request.getParameter("tepassword");
+		String password = request.getParameter("password");
 		String nickname = request.getParameter("nickname");
 		String state = request.getParameter("state");
 		
-		Uid uid = BizUtil.signup(telephone, password, nickname, state);
-		
-		ApiRet ret = new ApiRet();
-		
-		if (uid.getUid() < 0) {
-			ret.setCode(RetCode.NOT_FOUND);
-			ret.setData(new ErrMsg("Telephone already exists"));
-		} else {
-			ret.setCode(RetCode.SUCCESS);
-			ret.setData(uid);
+		if (telephone == null || telephone.isEmpty()) {
+			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, 
+					ErrMsg.TELEPHONE_NULL);
+			return;
 		}
 		
-		JSONObject jsonObject = JSONObject.fromObject(ret);
-		response.getWriter().append(jsonObject.toString());
+		if (password == null || password.isEmpty()) {
+			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, 
+					ErrMsg.PASSWORD_NULL);
+			return;
+		}
+		
+		if (nickname == null || nickname.isEmpty()) {
+			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST,
+					ErrMsg.NICKNAME_NULL);
+			return;
+		}
+		
+		if (state == null || nickname.isEmpty()) {
+			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST,
+					ErrMsg.STATE_NULL);
+		}
+		
+		if (BizUtil.checkUser(telephone)) {
+			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, 
+					ErrMsg.USER_ALREADY_EXIST);
+			return;
+		}
+		
+		Uid uid = BizUtil.signup(telephone, password, nickname, state);
+				
+		if (uid.getUid() < 0) {
+			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, ErrMsg.SIGNUP_ERROR);
+		} else {
+			HttpUtil.normalRespond(response, RetCode.SUCCESS, uid);
+		}
 	}
 
 	/**

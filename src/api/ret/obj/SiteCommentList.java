@@ -2,19 +2,21 @@ package api.ret.obj;
 
 import java.util.ArrayList;
 
+import entity.CommentForSite;
+
 public class SiteCommentList extends RetObjBase {
 
-	ArrayList<SiteComment> siteCommentList = new ArrayList<SiteComment>();
+	ArrayList<CommentForSite> siteCommentList = new ArrayList<CommentForSite>();
 
-	public ArrayList<SiteComment> getSiteCommentList() {
+	public ArrayList<CommentForSite> getSiteCommentList() {
 		return siteCommentList;
 	}
 
-	public void setSiteCommentList(ArrayList<SiteComment> siteCommentList) {
+	public void setSiteCommentList(ArrayList<CommentForSite> siteCommentList) {
 		this.siteCommentList = siteCommentList;
 	}
 	
-	public void addSiteCommnet(SiteComment comment) {
+	public void addSiteCommnet(CommentForSite comment) {
 		this.siteCommentList.add(comment);
 	}
 }

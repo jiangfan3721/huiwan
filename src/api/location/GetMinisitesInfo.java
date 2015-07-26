@@ -7,13 +7,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import api.ret.obj.ApiRet;
 import api.ret.obj.ErrMsg;
 import api.ret.obj.MinisiteInfoList;
 import api.ret.obj.RetCode;
-import api.ret.obj.SiteInfoList;
 import bll.BizUtil;
-import net.sf.json.JSONObject;
+import bll.HttpUtil;
 
 /**
  * Servlet implementation class GetMinisitesInfo
@@ -36,38 +34,28 @@ public class GetMinisitesInfo extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 		String minisiteIdsStr = request.getParameter("minisiteIds");
-		String[] minisiteIdStrArray = minisiteIdsStr.split(",");
+		if (minisiteIdsStr == null || minisiteIdsStr.isEmpty()) {
+			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, 
+					ErrMsg.SITE_IDS_NULL);
+			return;
+		}
+		String[] minisiteIdStrArray = minisiteIdsStr.split(";");
 		
 		long[] minisiteIds = new long[minisiteIdStrArray.length];
-		ApiRet ret = new ApiRet();
 		
 		for (int i = 0; i < minisiteIdStrArray.length; i++) {
 			try {
 				minisiteIds[i] = Long.parseLong(minisiteIdStrArray[i]);
 			} catch (NumberFormatException e) {
 				System.out.println("Error while parse " + minisiteIdStrArray[i] + " to long");
-				ret.setCode(RetCode.BAD_REQUEST);
-				ret.setData(new ErrMsg());
-				JSONObject jsonObject = JSONObject.fromObject(ret);
-				response.getWriter().append(jsonObject.toString());
+				HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, ErrMsg.NUMBER_FORMAT_ERROR);
 				return;
 			}
 		}
 		
 		MinisiteInfoList minisiteInfoList = BizUtil.getMinisitesInfo(minisiteIds);
 		
-		if (minisiteInfoList != null) {
-			ret.setCode(RetCode.SUCCESS);
-			ret.setData(minisiteInfoList);
-		} else {
-			ret.setCode(RetCode.NOT_FOUND);
-			ret.setData(new ErrMsg());
-		}
-		
-		JSONObject jsonObject = JSONObject.fromObject(ret);
-		response.setHeader("Content-type", "text/html;charset=UTF-8");
-		response.getWriter().append(jsonObject.toString());
-	
+		HttpUtil.normalRespond(response, RetCode.SUCCESS, minisiteInfoList);	
 	}
 
 	/**

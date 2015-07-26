@@ -7,12 +7,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import api.ret.obj.ApiRet;
 import api.ret.obj.ErrMsg;
-import api.ret.obj.OptRetCode;
 import api.ret.obj.RetCode;
 import bll.BizUtil;
-import net.sf.json.JSONObject;
+import bll.HttpUtil;
 
 /**
  * Servlet implementation class AddMinisiteCollect
@@ -34,46 +32,41 @@ public class AddMinisiteCollect extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
-		String siteIdStr = request.getParameter("minisiteId");
+		String minisiteIdStr = request.getParameter("minisiteId");
 		String uidStr = request.getParameter("uid");
 		
+		if (minisiteIdStr == null || minisiteIdStr.isEmpty()) {
+			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, 
+					ErrMsg.MINISITE_ID_NULL);
+			return;
+		}
+		
+		if (uidStr == null || uidStr.isEmpty()) {
+			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, 
+					ErrMsg.UID_NULL);
+			return;
+		}
+		
 		long uid = -1, minisiteId = -1;
-		ApiRet ret = new ApiRet();
 		
 		try {
 			uid = Long.parseLong(uidStr);
+			minisiteId = Long.parseLong(minisiteIdStr);
 		} catch (NumberFormatException e) {
-			System.out.println("Error while parse " + uidStr + " to long");
-			ret.setCode(RetCode.BAD_REQUEST);
-			ret.setData(new ErrMsg());
-			JSONObject jsonObject = JSONObject.fromObject(ret);
-			response.getWriter().append(jsonObject.toString());
+			System.out.println("Error while parse uid/minisiteId to long");
+			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, ErrMsg.NUMBER_FORMAT_ERROR);
 			return;
 		}
 		
-		try {
-			minisiteId = Long.parseLong(siteIdStr);
-		} catch (NumberFormatException e) {
-			System.out.println("Error while parse " + siteIdStr + " to long");
-			ret.setCode(RetCode.BAD_REQUEST);
-			ret.setData(new ErrMsg());
-			JSONObject jsonObject = JSONObject.fromObject(ret);
-			response.getWriter().append(jsonObject.toString());
+		if (BizUtil.checkMinisiteCollect(minisiteId, uid)) {
+			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, 
+					ErrMsg.MINISITE_COLLECT_ALREADY_EXIST);
 			return;
 		}
 		
-		int optRet = BizUtil.addMinisiteCollect(minisiteId, uid);
-		if (optRet > 0) {
-			ret.setCode(RetCode.SUCCESS);
-			ret.setData(OptRetCode.getSuccRetCode());
-		} else {
-			ret.setCode(RetCode.NOT_FOUND);
-			ret.setData(OptRetCode.getFailRetCode());
-		}
-		
-		JSONObject jsonObject = JSONObject.fromObject(ret);
-		response.getWriter().append(jsonObject.toString());
-
+		//int optRet = BizUtil.addMinisiteCollect(minisiteId, uid);
+		BizUtil.addMinisiteCollect(minisiteId, uid);
+		HttpUtil.normalRespond(response, RetCode.SUCCESS, null);
 	}
 
 	/**

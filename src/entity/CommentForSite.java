@@ -1,36 +1,38 @@
 package entity;
 
 import java.sql.Timestamp;
-import java.util.Date;
+import java.util.ArrayList;
 
 public class CommentForSite {
 	
-	private long commentsForDestinationId;
+	private long commentsForSiteId;
 	private long accountUserId;
 	private String nickname;
-	private long destinationId;
+	private String userIcon;
+	private long siteId;
 	private String content;
 	private int score;
-	private String picPath;
+	private ArrayList<String> picPath;
 	private Timestamp time;
 	
 	public CommentForSite(){
-		this.commentsForDestinationId = -1;
+		this.commentsForSiteId = -1;
 		this.accountUserId = -1;
 		this.nickname = "";
-		this.destinationId = -1;
+		this.userIcon = "";
+		this.siteId = -1;
 		this.content = "";
 		this.score = -1;
-		this.picPath = "";
 		this.time = new Timestamp(0);
+		this.picPath = new ArrayList<String>();
 	}
 
-	public long getCommentsForDestinationId() {
-		return commentsForDestinationId;
+	public long getCommentsForSiteId() {
+		return commentsForSiteId;
 	}
 
-	public void setCommentsForDestinationId(long commentsForDestinationId) {
-		this.commentsForDestinationId = commentsForDestinationId;
+	public void setCommentsForSiteId(long commentsForSiteId) {
+		this.commentsForSiteId = commentsForSiteId;
 	}
 
 	public long getAccountUserId() {
@@ -40,21 +42,29 @@ public class CommentForSite {
 	public void setAccountUserId(long accountUserId) {
 		this.accountUserId = accountUserId;
 	}
-	
-	public String getNickName(){
+
+	public String getNickname() {
 		return nickname;
 	}
-	
-	public void setNickName(String nickname){
+
+	public void setNickname(String nickname) {
 		this.nickname = nickname;
 	}
 
-	public long getDestinationId() {
-		return destinationId;
+	public String getUserIcon() {
+		return userIcon;
 	}
 
-	public void setDestinationId(long destinationId) {
-		this.destinationId = destinationId;
+	public void setUserIcon(String userIcon) {
+		this.userIcon = userIcon;
+	}
+
+	public long getSiteId() {
+		return siteId;
+	}
+
+	public void setSiteId(long siteId) {
+		this.siteId = siteId;
 	}
 
 	public String getContent() {
@@ -73,11 +83,11 @@ public class CommentForSite {
 		this.score = score;
 	}
 
-	public String getPicPath() {
+	public ArrayList<String> getPicPath() {
 		return picPath;
 	}
 
-	public void setPicPath(String picPath) {
+	public void setPicPath(ArrayList<String> picPath) {
 		this.picPath = picPath;
 	}
 

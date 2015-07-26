@@ -145,7 +145,7 @@ public class DBUtil {
 		PreparedStatement stmt = null;
         
 		Connection conn = DBUtil.getConnection();
-		String sql = "select user_id, telephone, nickname, user_icon, reg_time, sex, state "+
+		String sql = "select user_id, real_name, telephone, nickname, user_icon, reg_time, sex, state, birthday, self_introduction "+
 				"from account where user_id = ?;";
 		
 		Account result = new Account();
@@ -157,12 +157,15 @@ public class DBUtil {
 			
 			if (rs.next()) {
 				result.setUserId(rs.getLong(1));
-				result.setTelephone(rs.getString(2));
-				result.setNickname(rs.getString(3));
-				result.setUserIcon(rs.getString(4));
-				result.setRegTime(rs.getLong(5));
-				result.setSex(rs.getString(6));
-				result.setState(rs.getString(7));
+				result.setRealName(rs.getString(2));
+				result.setTelephone(rs.getString(3));
+				result.setNickname(rs.getString(4));
+				result.setUserIcon(rs.getString(5));
+				result.setRegTime(rs.getTimestamp(6));
+				result.setSex(rs.getString(7));
+				result.setState(rs.getString(8));
+				result.setBirthday(rs.getTimestamp(9));
+				result.setSelfIntroduction(rs.getString(10));
 			}
 			else{
 				result = null;
@@ -195,7 +198,7 @@ public class DBUtil {
 			stmt.setString(1, account.getTelephone());
 			stmt.setString(2, account.getPassword());
 			stmt.setString(3, account.getNickname());
-			stmt.setLong(4, account.getRegTime());
+			stmt.setTimestamp(4, account.getRegTime());
 			stmt.setString(5, account.getState());
 			
 			stmt.executeUpdate();
@@ -215,7 +218,7 @@ public class DBUtil {
 	/**
 	 * updateUserInformation
 	 * @param account Account; user new information
-	 * @return Account; new information if success; null if fail ???what is new information
+	 * @return Account; new information if success; null if fail
 	 */
 	public static void updateUserInfo(Account account){
 		
@@ -306,18 +309,58 @@ public class DBUtil {
 	}
 	
 	/**
-	 * Get Destination List in city_id
+	 * getCityInfo
+	 * @param cityId
+	 * @return City; City information if success; null if fail
+	 */
+	public static City getCityInfo(long cityId){
+
+		PreparedStatement stmt = null;
+        
+		Connection conn = DBUtil.getConnection();
+		String sql = "select name, city_sketch, city_information, english_name, pic_path "+
+				"from city "+
+				"where city_id = ?;";
+		
+		City result = new City();
+		try {
+			stmt = conn.prepareStatement(sql);
+			stmt.setLong(1, cityId);
+			
+			ResultSet rs = stmt.executeQuery();
+			
+			if (rs.next()) {
+				result.setName(rs.getString(1));
+				result.setCitySketch(rs.getString(2));
+				result.setCityInformation(rs.getString(3));
+				result.setEnglishName(rs.getString(4));
+				result.setPicPath(rs.getString(5));
+			}
+			else{
+				result = null;
+			}
+			
+			DBUtil.close(conn, stmt, rs);
+			
+		} catch (SQLException e) {
+			System.out.println("Something error in GetCityInfo");
+		}
+		return result;
+	}
+	
+	/**
+	 * Get Site List in city_id
 	 * @param cityId
 	 * @param size
 	 * @param offset
-	 * @return ArrayList of Long which contains all destination_id in city_id
+	 * @return ArrayList of Long which contains all site_id in city_id
 	 */
 	public static ArrayList<Long> getSiteList(long cityId, long size, long offset){
 
 		PreparedStatement stmt = null;
         
 		Connection conn = DBUtil.getConnection();
-		String sql = "select destination_id from destination "+
+		String sql = "select site_id from site "+
 					"where City_city_id = ? " +
 					"limit ?, ?;";
 		
@@ -338,7 +381,7 @@ public class DBUtil {
 			DBUtil.close(conn, stmt, rs);
 			
 		} catch (SQLException e) {
-			System.out.println("Something error in getCityList");
+			System.out.println("Something error in getSiteList");
 		}
 		return result;
 	}
@@ -353,9 +396,9 @@ public class DBUtil {
 		PreparedStatement stmt = null;
         
 		Connection conn = DBUtil.getConnection();
-		String sql = "select name, logo_path, address, pic_path, rate, coors_x, coors_y, desc_path, key_value "+
-				"from destination "+
-				"where destination_id = ?;";
+		String sql = "select site_id, name, logo_path, address, rate, coors_x, coors_y, key_value, City_city_id, desc_path, english_name "+
+				"from site "+
+				"where site_id = ?;";
 		
 		Site result = new Site();
 		try {
@@ -365,16 +408,17 @@ public class DBUtil {
 			ResultSet rs = stmt.executeQuery();
 			
 			if (rs.next()) {
-				result.setName(rs.getString(1));
-				result.setLogoPath(rs.getString(2));
-				result.setAddress(rs.getString(3));
-				result.setPicPath(rs.getString(4));
+				result.setSiteId(rs.getLong(1));
+				result.setName(rs.getString(2));
+				result.setLogoPath(rs.getString(3));
+				result.setAddress(rs.getString(4));
 				result.setRate(rs.getString(5));
 				result.setCoorsX(rs.getFloat(6));
 				result.setCoorsY(rs.getFloat(7));
-				result.setDescPath(rs.getString(8));
-				result.setKeyValue(rs.getString(9));
-				result.setDestinationId(siteId);
+				result.setKeyValue(rs.getString(8));
+				result.setCityId(rs.getLong(9));
+				result.setDescPath(rs.getString(10));
+				result.setEnglishName(rs.getString(11));
 			}
 			else{
 				result = null;
@@ -398,9 +442,9 @@ public class DBUtil {
 		PreparedStatement stmt = null;
         
 		Connection conn = DBUtil.getConnection();
-		String sql = "select name, logo_path, address, pic_path, coors_x, coors_y, desc_path, key_value, music_path, irc_path "+
-				"from site "+
-				"where site_id = ?;";
+		String sql = "select name, logo_path, address, coors_x, coors_y, desc_path, key_value, music_path, lrc_path, english_name "+
+				"from minisite "+
+				"where minisite_id = ?;";
 		
 		Minisite result = new Minisite();
 		try {
@@ -413,13 +457,13 @@ public class DBUtil {
 				result.setName(rs.getString(1));
 				result.setLogoPath(rs.getString(2));
 				result.setAddress(rs.getString(3));
-				result.setPicPath(rs.getString(4));
-				result.setCoorsX(rs.getFloat(5));
-				result.setCoorsY(rs.getFloat(6));
-				result.setDescPath(rs.getString(7));
-				result.setKeyValue(rs.getString(8));
-				result.setMusicPath(rs.getString(9));
-				result.setIrcPath(rs.getString(10));
+				result.setCoorsX(rs.getFloat(4));
+				result.setCoorsY(rs.getFloat(5));
+				result.setDescPath(rs.getString(6));
+				result.setKeyValue(rs.getString(7));
+				result.setMusicPath(rs.getString(8));
+				result.setIrcPath(rs.getString(9));
+				result.setEnglishName(rs.getString(10));
 				result.setSiteId(minisiteId);
 			}
 			else{
@@ -438,22 +482,20 @@ public class DBUtil {
 	 * addPlan
 	 * @param siteId site id
 	 * @param uid user id
-	 * @param currentTime
 	 * @return int; 1 if success; -1 if fail
 	 */
-	public static int addPlan(long siteId, long uid, Timestamp currentTime) {
+	public static int addPlan(long siteId, long uid) {
 		
 		PreparedStatement stmt = null;
         
 		Connection conn = DBUtil.getConnection();
-		String sql = "INSERT INTO plan(Account_user_id, Destination_destination_id, time) "
-				+ "VALUES(?, ?, ?)";
+		String sql = "INSERT INTO plan(Account_user_id, Site_site_id) "
+				+ "VALUES(?, ?)";
 		
 		try {
 			stmt = conn.prepareStatement(sql);
 			stmt.setLong(1, uid);
 			stmt.setLong(2, siteId);
-			stmt.setTimestamp(3, currentTime);
 			
 			stmt.executeUpdate();
 			
@@ -477,7 +519,7 @@ public class DBUtil {
         
 		Connection conn = DBUtil.getConnection();
 		String sql = "delete from plan "+
-					"where Account_user_id = ? and Destination_destination_id = ?;";
+					"where Account_user_id = ? and Site_site_id = ?;";
 		
 		try {
 			stmt = conn.prepareStatement(sql);
@@ -505,7 +547,7 @@ public class DBUtil {
 		PreparedStatement stmt = null;
         
 		Connection conn = DBUtil.getConnection();
-		String sql = "INSERT INTO favoritesite(Account_user_id, Site_commentsForSite_id) "
+		String sql = "INSERT INTO favoriteminisite(Account_user_id, Minisite_minisite_id) "
 				+ "VALUES(?, ?)";
 		
 		try {
@@ -534,8 +576,8 @@ public class DBUtil {
 		PreparedStatement stmt = null;
         
 		Connection conn = DBUtil.getConnection();
-		String sql = "delete from favoritesite "+
-				"where Account_user_id = ? and Site_commentsForSite_id = ?;";
+		String sql = "delete from favoriteminisite "+
+				"where Account_user_id = ? and Minisite_minisite_id = ?;";
 		
 		try {
 			stmt = conn.prepareStatement(sql);
@@ -553,21 +595,21 @@ public class DBUtil {
 	}
 	
 	/**
-	 * comments about destination
+	 * comments about site
 	 * @param siteId site_id
 	 * @param size String; size of ArrayList
 	 * @param offset String;
-	 * @return ArrayList of CommentsForDestination
+	 * @return ArrayList of CommentsForSite
 	 */
 	public static ArrayList<CommentForSite> getSiteComments(long siteId, long size, long offset) {
 		
 		PreparedStatement stmt = null;
         
 		Connection conn = DBUtil.getConnection();
-		String sql = "select Account_user_id, time, score, content, pic_path, nickname "+ 
-					"from commentsfordestination, account "+
-					"where commentsfordestination.Account_user_id = account.user_id and "+
-					"commentsfordestination.Destination_destination_id = ? "+
+		String sql = "select Account_user_id, time, score, content, nickname, user_icon, commentsForSite_id "+ 
+					"from commentsforsite, account "+
+					"where commentsforsite.Account_user_id = account.user_id and "+
+					"commentsforsite.Site_site_id = ? "+
 					"limit ?, ?;";
 		
 		ArrayList<CommentForSite> result = new ArrayList<CommentForSite>();
@@ -585,8 +627,9 @@ public class DBUtil {
 				t.setTime(rs.getTimestamp(2));
 				t.setScore(rs.getInt(3));
 				t.setContent(rs.getString(4));
-				t.setPicPath(rs.getString(5));
-				t.setNickName(rs.getString(6));
+				t.setNickname(rs.getString(5));
+				t.setUserIcon(rs.getString(6));
+				t.setCommentsForSiteId(rs.getLong(7));
 				
 				result.add(t);
 			}
@@ -596,6 +639,150 @@ public class DBUtil {
 		} catch (SQLException e) {
 			System.out.println("Something error in GetSiteComments");
 		}
+		
+		for (int i = 0; i < result.size(); i++) {
+			result.get(i).setPicPath(getPictureForSiteByCommentId(result.get(i).getCommentsForSiteId()));
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * addPictureForSite
+	 * @param pic_path String
+	 * @param commentId long
+	 * @param userId long
+	 * @param siteId long
+	 * @return int; 1 if success; -1 if fail
+	 */
+	public static int addPictureForSite(String pic_path, long commentId, long userId, long siteId) {
+		
+		PreparedStatement stmt = null;
+        
+		Connection conn = DBUtil.getConnection();
+		String sql = "INSERT INTO pictureforcommentsforsite(picture_path, CommentsForSite_commentsForSite_id, CommentsForSite_Account_user_id, CommentsForSite_Site_site_id) "
+				+ "VALUES(?, ?, ?, ?)";
+		
+		try {
+			stmt = conn.prepareStatement(sql);
+			stmt.setString(1, pic_path);
+			stmt.setLong(2, commentId);
+			stmt.setLong(3, userId);
+			stmt.setLong(4, siteId);
+			
+			stmt.executeUpdate();
+			
+			DBUtil.close(conn, stmt, null);
+		} catch (SQLException e) {
+			System.out.println("Something error in addPictureForSite");
+			return -1;
+		}
+		return 1;
+	}
+
+	
+	/**
+	 * getPictureForSiteByCommentId
+	 * @param commentId comment_id
+	 * @return ArrayList of String for picture path
+	 */
+	public static ArrayList<String> getPictureForSiteByCommentId(Long commentId) {
+		
+		PreparedStatement stmt = null;
+        
+		Connection conn = DBUtil.getConnection();
+		String sql = "select picture_path "+ 
+					"from pictureforcommentsforsite "+
+					"where CommentsForSite_commentsForSite_id = ?; ";
+		
+		ArrayList<String> result = new ArrayList<String>();
+		try {
+			stmt = conn.prepareStatement(sql);
+			stmt.setLong(1, commentId);
+			
+			ResultSet rs = stmt.executeQuery();
+			
+			while(rs.next()) {
+				result.add(rs.getString(1));
+			}
+			
+			DBUtil.close(conn, stmt, rs);
+			
+		} catch (SQLException e) {
+			System.out.println("Something error in getPictureForSiteByCommentId");
+		}
+		
+		
+		return result;
+	}
+	
+	/**
+	 * getPictureForSiteByUserId
+	 * @param userId user_id
+	 * @return ArrayList of String for picture path
+	 */
+	public static ArrayList<String> getPictureForSiteByUserId(Long userId) {
+		
+		PreparedStatement stmt = null;
+        
+		Connection conn = DBUtil.getConnection();
+		String sql = "select picture_path "+ 
+					"from pictureforcommentsforsite "+
+					"where CommentsForSite_Account_user_id = ?; ";
+		
+		ArrayList<String> result = new ArrayList<String>();
+		try {
+			stmt = conn.prepareStatement(sql);
+			stmt.setLong(1, userId);
+			
+			ResultSet rs = stmt.executeQuery();
+			
+			while(rs.next()) {
+				result.add(rs.getString(1));
+			}
+			
+			DBUtil.close(conn, stmt, rs);
+			
+		} catch (SQLException e) {
+			System.out.println("Something error in getPictureForSiteByUserId");
+		}
+		
+		
+		return result;
+	}
+	
+	/**
+	 * getPictureForSiteBySiteId
+	 * @param siteId site_id
+	 * @return ArrayList of String for picture path
+	 */
+	public static ArrayList<String> getPictureForSiteBySiteId(Long siteId) {
+		
+		PreparedStatement stmt = null;
+        
+		Connection conn = DBUtil.getConnection();
+		String sql = "select picture_path "+ 
+					"from pictureforcommentsforsite "+
+					"where CommentsForSite_Site_site_id = ?; ";
+		
+		ArrayList<String> result = new ArrayList<String>();
+		try {
+			stmt = conn.prepareStatement(sql);
+			stmt.setLong(1, siteId);
+			
+			ResultSet rs = stmt.executeQuery();
+			
+			while(rs.next()) {
+				result.add(rs.getString(1));
+			}
+			
+			DBUtil.close(conn, stmt, rs);
+			
+		} catch (SQLException e) {
+			System.out.println("Something error in getPictureForSiteBySiteId");
+		}
+		
+		
 		return result;
 	}
 	
@@ -607,14 +794,14 @@ public class DBUtil {
 	 * @return ArrayList of CommentsForSite
 	 */
 	public static ArrayList<CommentForMinisite> getMinisiteComments(long minisiteId, long size, long offset) {
-		
+				
 		PreparedStatement stmt = null;
         
 		Connection conn = DBUtil.getConnection();
-		String sql = "select Account_user_id, time, content, nickname "+ 
-				"from commentsforsite, account "+
-				"where commentsforsite.Account_user_id = account.user_id "+
-				"and commentsforsite.Site_commentsForSite_id = ? "+
+		String sql = "select Account_user_id, time, content, nickname, user_icon, commentsForMinisite_id "+ 
+				"from commentsforminisite, account "+
+				"where commentsforminisite.Account_user_id = account.user_id "+
+				"and commentsforminisite.Minisite_minisite_id = ? "+
 				"limit ?, ?;";
 		
 		ArrayList<CommentForMinisite> result = new ArrayList<CommentForMinisite>();
@@ -632,40 +819,181 @@ public class DBUtil {
 				t.setAccountUserId(rs.getLong(1));
 				t.setTime(rs.getTimestamp(2));
 				t.setContent(rs.getString(3));
-				t.setNickName(rs.getString(4));
+				t.setNickname(rs.getString(4));
+				t.setUserIcon(rs.getString(5));
+				t.setCommentsForMinisiteId(rs.getLong(6));
 				
 				result.add(t);
 			}
 			
 			DBUtil.close(conn, stmt, rs);
 		} catch (SQLException e) {
-			System.out.println("Something error in signup");
+			System.out.println("Something error in getMinisiteComments");
 		}
+		
+		for (int i = 0; i < result.size(); i++) {
+			result.get(i).setPicPath(getPictureForMinisiteByCommentId(result.get(i).getCommentsForMinisiteId()));
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * addPictureForMinisite
+	 * @param pic_path String
+	 * @param commentId long
+	 * @param userId long
+	 * @param minisiteId long
+	 * @return int; 1 if success; -1 if fail
+	 */
+	public static int addPictureForMinisite(String pic_path, long commentId, long userId, long minisiteId) {
+		
+		PreparedStatement stmt = null;
+        
+		Connection conn = DBUtil.getConnection();
+		String sql = "INSERT INTO pictureforcommentsforminisite(picture_path, CommentsForMinisite_commentsForMinisite_id, CommentsForMinisite_Account_user_id, CommentsForMinisite_Minisite_minisite_id) "
+				+ "VALUES(?, ?, ?, ?)";
+		
+		try {
+			stmt = conn.prepareStatement(sql);
+			stmt.setString(1, pic_path);
+			stmt.setLong(2, commentId);
+			stmt.setLong(3, userId);
+			stmt.setLong(4, minisiteId);
+			
+			stmt.executeUpdate();
+			
+			DBUtil.close(conn, stmt, null);
+		} catch (SQLException e) {
+			System.out.println("Something error in addPictureForMinisite");
+			return -1;
+		}
+		return 1;
+	}
+	
+	/**
+	 * getPictureForMinisiteByCommentId
+	 * @param commentId comment_id
+	 * @return ArrayList of String for picture path
+	 */
+	public static ArrayList<String> getPictureForMinisiteByCommentId(Long commentId) {
+		
+		PreparedStatement stmt = null;
+        
+		Connection conn = DBUtil.getConnection();
+		String sql = "select picture_path "+ 
+					"from pictureforcommentsforminisite "+
+					"where CommentsForMinisite_commentsForMinisite_id = ?; ";
+		
+		ArrayList<String> result = new ArrayList<String>();
+		try {
+			stmt = conn.prepareStatement(sql);
+			stmt.setLong(1, commentId);
+			
+			ResultSet rs = stmt.executeQuery();
+			
+			while(rs.next()) {
+				result.add(rs.getString(1));
+			}
+			
+			DBUtil.close(conn, stmt, rs);
+			
+		} catch (SQLException e) {
+			System.out.println("Something error in getPictureForMinisiteByCommentId");
+		}
+		
+		
+		return result;
+	}
+	
+	/**
+	 * getPictureForMinisiteByUserId
+	 * @param userId user_id
+	 * @return ArrayList of String for picture path
+	 */
+	public static ArrayList<String> getPictureForMinisiteByUserId(Long userId) {
+		
+		PreparedStatement stmt = null;
+        
+		Connection conn = DBUtil.getConnection();
+		String sql = "select picture_path "+ 
+					"from pictureforcommentsforminisite "+
+					"where CommentsForMinisite_Account_user_id = ?; ";
+		
+		ArrayList<String> result = new ArrayList<String>();
+		try {
+			stmt = conn.prepareStatement(sql);
+			stmt.setLong(1, userId);
+			
+			ResultSet rs = stmt.executeQuery();
+			
+			while(rs.next()) {
+				result.add(rs.getString(1));
+			}
+			
+			DBUtil.close(conn, stmt, rs);
+			
+		} catch (SQLException e) {
+			System.out.println("Something error in getPictureForMinisiteByUserId");
+		}
+		
+		
+		return result;
+	}
+	
+	/**
+	 * getPictureForMinisiteByMinisiteId
+	 * @param siteId site_id
+	 * @return ArrayList of String for picture path
+	 */
+	public static ArrayList<String> getPictureForMinisiteByMinisiteId(Long minisiteId) {
+		
+		PreparedStatement stmt = null;
+        
+		Connection conn = DBUtil.getConnection();
+		String sql = "select picture_path "+ 
+					"from pictureforcommentsforminisite "+
+					"where CommentsForMinisite_Minisite_minisite_id = ?; ";
+		
+		ArrayList<String> result = new ArrayList<String>();
+		try {
+			stmt = conn.prepareStatement(sql);
+			stmt.setLong(1, minisiteId);
+			
+			ResultSet rs = stmt.executeQuery();
+			
+			while(rs.next()) {
+				result.add(rs.getString(1));
+			}
+			
+			DBUtil.close(conn, stmt, rs);
+			
+		} catch (SQLException e) {
+			System.out.println("Something error in getPictureForMinisiteByMinisiteId");
+		}
+		
+		
 		return result;
 	}
 	
 	/**
 	 * Get plan List about user_id
 	 * @param userId String; user_id
-	 * @param startTime String;
-	 * @param endTime String;
 	 * @return ArrayList of Long which contains all plan site id about user_id
 	 */
-	public static ArrayList<Long> getPlanList(long userId, Timestamp startTime, Timestamp endTime){
+	public static ArrayList<Long> getPlanList(long userId){
 
 		PreparedStatement stmt = null;
         
 		Connection conn = DBUtil.getConnection();
-		String sql = "SELECT Destination_destination_id FROM plan "+
-				"where Account_user_id = ? and time > ? and time < ?;";
+		String sql = "SELECT Site_site_id FROM plan "+
+				"where Account_user_id = ? ;";
 		
 		ArrayList<Long> result = new ArrayList<Long>();
 		
 		try {
 			stmt = conn.prepareStatement(sql);
 			stmt.setLong(1, userId);
-			stmt.setTimestamp(2, startTime);
-			stmt.setTimestamp(3, endTime);
 			
 			ResultSet rs = stmt.executeQuery();
 			
@@ -682,16 +1010,16 @@ public class DBUtil {
 	}
 	
 	/**
-	 * Get Favorite site List about user_id
+	 * Get Favorite minisite List about user_id
 	 * @param userId user_id
-	 * @return ArrayList of Long which contains all favorite site id about user_id
+	 * @return ArrayList of Long which contains all favorite minisite id about user_id
 	 */
 	public static ArrayList<Long> getMinisiteCollectList(long userId){
 
 		PreparedStatement stmt = null;
         
 		Connection conn = DBUtil.getConnection();
-		String sql = "select Site_commentsForSite_id from favoritesite "+
+		String sql = "select Minisite_minisite_id from favoriteminisite "+
 				"where Account_user_id = ?;";
 		
 		ArrayList<Long> result = new ArrayList<Long>();
@@ -715,36 +1043,172 @@ public class DBUtil {
 	}
 	
 	/**
-	 * comment
+	 * commentMinisite
 	 * @param minisiteId String
-	 * @param desc String; content
+	 * @param content String; content
 	 * @param uid String; user id
 	 * @param commentTime String;
+	 * @param picPath ArrayList<String>
 	 * @return int; 1 if success; -1 if fail
 	 */
-	public static int comment(long minisiteId, String desc, long uid, Timestamp commentTime) {
+	public static int commentMinisite(long minisiteId, String content, long uid, Timestamp commentTime, ArrayList<String> picPath) {
 		
 		PreparedStatement stmt = null;
         
 		Connection conn = DBUtil.getConnection();
-		String sql = "INSERT INTO commentsforsite(Account_user_id, Site_commentsForSite_id, content, time, score) "
-				+ "VALUES(?, ?, ?, ?, ?)";
+		String sql = "INSERT INTO commentsforminisite(Account_user_id, Minisite_minisite_id, content, time) "
+				+ "VALUES(?, ?, ?, ?) select @@IDENTITY;";
+		
+		long commentId = -1;
 		
 		try {
 			stmt = conn.prepareStatement(sql);
 			stmt.setLong(1, uid);
 			stmt.setLong(2, minisiteId);
-			stmt.setString(3, desc);
+			stmt.setString(3, content);
 			stmt.setTimestamp(4, commentTime);
-			stmt.setInt(5, 3);
 			
-			stmt.executeUpdate();
+			ResultSet rs = stmt.executeQuery();
 			
-			DBUtil.close(conn, stmt, null);
+			if (rs.next()){
+				commentId = rs.getLong(1);
+			} else {
+				System.out.println("Something error in commentMinisite. Maybe @@IDENTITY didn't fetch a identity to commentId");
+				return -1;
+			}
+			
+			DBUtil.close(conn, stmt, rs);
 		} catch (SQLException e) {
-			System.out.println("Something error in comment");
+			System.out.println("Something error in commentMinisite");
 			return -1;
 		}
+		
+		for (int i = 0; i < picPath.size(); i++)
+		{
+			DBUtil.addPictureForMinisite(picPath.get(i), commentId, uid, minisiteId);
+		}
+		
 		return 1;
+	}
+	
+	/**
+	 * commentSite
+	 * @param siteId String
+	 * @param content String; content
+	 * @param score int;
+	 * @param uid String; user id
+	 * @param commentTime String;
+	 * @param picPath ArrayList<String>
+	 * @return int; 1 if success; -1 if fail
+	 */
+	public static int commentSite(long siteId, String content, int score, long uid, Timestamp commentTime, ArrayList<String> picPath) {
+		
+		PreparedStatement stmt = null;
+        
+		Connection conn = DBUtil.getConnection();
+		String sql = "INSERT INTO commentsforsite(Account_user_id, Site_site_id, content, time, score) "
+				+ "VALUES(?, ?, ?, ?, ?) select @@IDENTITY;";
+		
+		long commentId = -1;
+		
+		try {
+			stmt = conn.prepareStatement(sql);
+			stmt.setLong(1, uid);
+			stmt.setLong(2, siteId);
+			stmt.setString(3, content);
+			stmt.setTimestamp(4, commentTime);
+			stmt.setInt(5, score);
+			
+			ResultSet rs = stmt.executeQuery();
+			
+			if (rs.next()){
+				commentId = rs.getLong(1);
+			} else {
+				System.out.println("Something error in commentSite. Maybe @@IDENTITY didn't fetch a identity to commentId");
+				return -1;
+			}
+			
+			DBUtil.close(conn, stmt, rs);
+		} catch (SQLException e) {
+			System.out.println("Something error in commentSite");
+			return -1;
+		}
+		
+		for (int i = 0; i < picPath.size(); i++)
+		{
+			DBUtil.addPictureForSite(picPath.get(i), commentId, uid, siteId);
+		}
+		
+		return 1;
+	}
+	
+	/**
+	 * checkPlan
+	 * @param siteId long
+	 * @param uid long
+	 * @return Bool; true if exist
+	 */
+	public static boolean checkPlan(long siteId, long uid) {
+		
+		PreparedStatement stmt = null;
+		
+		Connection conn = DBUtil.getConnection();
+		String sql = "select * from plan "+
+				"where Site_site_id = ? and Account_user_id = ?";
+		
+		try {
+			stmt = conn.prepareStatement(sql);
+			stmt.setLong(1, siteId);
+			stmt.setLong(2, uid);
+			
+			ResultSet rs = stmt.executeQuery();
+			
+			if (rs.next()){
+				DBUtil.close(conn, stmt, rs);
+				return true;
+			}
+			else {
+				DBUtil.close(conn, stmt, rs);
+				return false;
+			}
+		} catch (SQLException e) {
+			System.out.println("Something error in checkPlan");
+		}
+		return false;
+	}
+	
+	/**
+	 * checkMinisiteCollect
+	 * @param minisiteId long
+	 * @param uid long
+	 * @return Bool; true if exist
+	 */
+	public static boolean checkMinisiteCollect(long minisiteId, long uid) {
+		
+		PreparedStatement stmt = null;
+		
+		Connection conn = DBUtil.getConnection();
+		String sql = "select * from favoriteminisite "+
+				"where Minisite_minisite_id = ? and Account_user_id = ?";
+		
+		try {
+			stmt = conn.prepareStatement(sql);
+			stmt.setLong(1, minisiteId);
+			stmt.setLong(2, uid);
+			
+			ResultSet rs = stmt.executeQuery();
+			
+			if (rs.next()){
+				DBUtil.close(conn, stmt, rs);
+				return true;
+			}
+			else {
+				DBUtil.close(conn, stmt, rs);
+				return false;
+			}
+		} catch (SQLException e) {
+			System.out.println("Something error in checkMinisiteCollect");
+		}
+		return false;
 	}
 }

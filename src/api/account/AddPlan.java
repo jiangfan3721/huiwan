@@ -7,12 +7,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import api.ret.obj.ApiRet;
 import api.ret.obj.ErrMsg;
-import api.ret.obj.OptRetCode;
 import api.ret.obj.RetCode;
 import bll.BizUtil;
-import net.sf.json.JSONObject;
+import bll.HttpUtil;
 
 /**
  * Servlet implementation class AddPlan
@@ -37,42 +35,38 @@ public class AddPlan extends HttpServlet {
 		String siteIdStr = request.getParameter("siteId");
 		String uidStr = request.getParameter("uid");
 		
+		if (siteIdStr == null || siteIdStr.isEmpty()) {
+			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, 
+					ErrMsg.SITE_ID_NULL);
+			return;
+		}
+		
+		if (uidStr == null || uidStr.isEmpty()) {
+			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, 
+					ErrMsg.UID_NULL);
+			return;
+		}
+		
 		long uid = -1, siteId = -1;
-		ApiRet ret = new ApiRet();
 		
 		try {
 			uid = Long.parseLong(uidStr);
-		} catch (NumberFormatException e) {
-			System.out.println("Error while parse " + uidStr + " to long");
-			ret.setCode(RetCode.BAD_REQUEST);
-			ret.setData(new ErrMsg());
-			JSONObject jsonObject = JSONObject.fromObject(ret);
-			response.getWriter().append(jsonObject.toString());
-			return;
-		}
-		
-		try {
 			siteId = Long.parseLong(siteIdStr);
 		} catch (NumberFormatException e) {
-			System.out.println("Error while parse " + siteIdStr + " to long");
-			ret.setCode(RetCode.BAD_REQUEST);
-			ret.setData(new ErrMsg());
-			JSONObject jsonObject = JSONObject.fromObject(ret);
-			response.getWriter().append(jsonObject.toString());
+			System.out.println("Error while parse uid/siteId to long");
+			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, ErrMsg.NUMBER_FORMAT_ERROR);
 			return;
 		}
 		
-		int optRet = BizUtil.addPlan(siteId, uid);
-		if (optRet > 0) {
-			ret.setCode(RetCode.SUCCESS);
-			ret.setData(OptRetCode.getSuccRetCode());
-		} else {
-			ret.setCode(RetCode.NOT_FOUND);
-			ret.setData(OptRetCode.getFailRetCode());
+		if (BizUtil.checkPlan(siteId, uid)) {
+			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, 
+					ErrMsg.PLAN_ALREADY_EXIST);
+			return;
 		}
 		
-		JSONObject jsonObject = JSONObject.fromObject(ret);
-		response.getWriter().append(jsonObject.toString());
+		//int optRet = BizUtil.addPlan(siteId, uid);
+		BizUtil.addPlan(siteId, uid);
+		HttpUtil.normalRespond(response, RetCode.SUCCESS, null);
 	}
 
 	/**

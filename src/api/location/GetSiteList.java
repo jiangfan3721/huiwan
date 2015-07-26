@@ -7,12 +7,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import api.ret.obj.ApiRet;
 import api.ret.obj.ErrMsg;
 import api.ret.obj.RetCode;
-import api.ret.obj.SiteList;
+import api.ret.obj.SiteIdList;
 import bll.BizUtil;
-import net.sf.json.JSONObject;
+import bll.HttpUtil;
 
 /**
  * Servlet implementation class GetSiteList
@@ -38,8 +37,25 @@ public class GetSiteList extends HttpServlet {
 		String sizeStr = request.getParameter("size");
 		String offsetStr = request.getParameter("offset");
 		
+		if (cityIdStr == null || cityIdStr.isEmpty()) {
+			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, 
+					ErrMsg.TELEPHONE_NULL);
+			return;
+		}
+		
+		if (sizeStr == null || sizeStr.isEmpty()) {
+			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, 
+					ErrMsg.SIZE_NULL);
+			return;
+		}
+		
+		if (offsetStr == null || offsetStr.isEmpty()) {
+			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, 
+					ErrMsg.OFFSET_NULL);
+			return;
+		}
+		
 		long cityId = -1, size = 0, offset = 0;
-		ApiRet ret = new ApiRet();
 		
 		try {
 			cityId = Long.parseLong(cityIdStr);
@@ -47,19 +63,13 @@ public class GetSiteList extends HttpServlet {
 			offset = Long.parseLong(offsetStr);
 		} catch (NumberFormatException e) {
 			System.out.println("Error while parse cityId/size/offset to long");
-			ret.setCode(RetCode.BAD_REQUEST);
-			ret.setData(new ErrMsg());
-			JSONObject jsonObject = JSONObject.fromObject(ret);
-			response.getWriter().append(jsonObject.toString());
+			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, ErrMsg.NUMBER_FORMAT_ERROR);
 			return;
 		}
 		
-		SiteList siteList = BizUtil.getSiteList(cityId, size, offset);
+		SiteIdList siteIdList = BizUtil.getSiteList(cityId, size, offset);
 		
-		ret.setCode(RetCode.SUCCESS);
-		ret.setData(siteList);
-		JSONObject jsonObject = JSONObject.fromObject(ret);
-		response.getWriter().append(jsonObject.toString());
+		HttpUtil.normalRespond(response, RetCode.SUCCESS, siteIdList);
 	}
 
 	/**

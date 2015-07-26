@@ -1,7 +1,6 @@
 package entity;
 
 import java.sql.Timestamp;
-import java.util.Date;
 
 public class Account {
 	
@@ -11,7 +10,7 @@ public class Account {
 	private String password;
 	private String nickname;
 	private String userIcon;
-	private long regTime;
+	private Timestamp regTime;
 	private String sex;
 	private String state;
 	private Timestamp birthday;
@@ -24,7 +23,7 @@ public class Account {
 		this.password = "";
 		this.nickname = "";
 		this.userIcon = "";
-		this.regTime = 0;
+		this.regTime = new Timestamp(0);
 		this.sex = "";
 		this.state = "";
 		this.birthday = new Timestamp(0);
@@ -67,10 +66,10 @@ public class Account {
 	public void setUserIcon(String userIcon) {
 		this.userIcon = userIcon;
 	}
-	public long getRegTime() {
+	public Timestamp getRegTime() {
 		return regTime;
 	}
-	public void setRegTime(long regTime) {
+	public void setRegTime(Timestamp regTime) {
 		this.regTime = regTime;
 	}
 	public String getSex() {

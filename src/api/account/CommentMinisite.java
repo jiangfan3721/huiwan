@@ -1,6 +1,9 @@
 package api.account;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -13,16 +16,16 @@ import bll.BizUtil;
 import bll.HttpUtil;
 
 /**
- * Servlet implementation class DeleteMinisiteCollect
+ * Servlet implementation class Comment
  */
-@WebServlet("/api/account/deleteMinisiteCollect")
-public class DeleteMinisiteCollect extends HttpServlet {
+@WebServlet("/api/account/commentMinisite")
+public class CommentMinisite extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public DeleteMinisiteCollect() {
+    public CommentMinisite() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -31,13 +34,21 @@ public class DeleteMinisiteCollect extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
+
 		String minisiteIdStr = request.getParameter("minisiteId");
+		String content = request.getParameter("content");
 		String uidStr = request.getParameter("uid");
+		String picPathStr = request.getParameter("picPath");
 		
 		if (minisiteIdStr == null || minisiteIdStr.isEmpty()) {
 			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, 
 					ErrMsg.MINISITE_ID_NULL);
+			return;
+		}
+		
+		if (content == null || content.isEmpty()) {
+			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, 
+					ErrMsg.CONTENT_NULL);
 			return;
 		}
 		
@@ -47,24 +58,21 @@ public class DeleteMinisiteCollect extends HttpServlet {
 			return;
 		}
 		
-		long uid = -1, minisiteId = -1;
-		
+		long minisiteId = -1, uid = -1;
 		try {
 			uid = Long.parseLong(uidStr);
 			minisiteId = Long.parseLong(minisiteIdStr);
 		} catch (NumberFormatException e) {
-			System.out.println("Error while parse uid/minisiteId to long");
+			System.out.println("Error while parse minisiteId/uid to long.");
 			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, ErrMsg.NUMBER_FORMAT_ERROR);
 			return;
 		}
 		
-		if (!BizUtil.checkMinisiteCollect(minisiteId, uid)) {
-			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, 
-					ErrMsg.MINISITE_COLLECT_NOT_EXIST);
-			return;
-		}
+		String[] paths = picPathStr.split(";");
+		ArrayList<String> picPath = (ArrayList<String>) Arrays.asList(paths);
 		
-		BizUtil.deleteMinisiteCollect(minisiteId, uid);
+		//int optRet = BizUtil.commentMinisite(minisiteId, content, uid, picPath);
+		BizUtil.commentMinisite(minisiteId, content, uid, picPath);
 		HttpUtil.normalRespond(response, RetCode.SUCCESS, null);
 	}
 

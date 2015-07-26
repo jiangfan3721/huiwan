@@ -2,19 +2,21 @@ package api.ret.obj;
 
 import java.util.ArrayList;
 
+import entity.Site;
+
 public class SiteInfoList extends RetObjBase {
 	
-	ArrayList<SiteInfo> siteInfoList = new ArrayList<SiteInfo>();
+	ArrayList<Site> siteInfoList = new ArrayList<Site>();
 
-	public ArrayList<SiteInfo> getSiteInfoList() {
+	public ArrayList<Site> getSiteInfoList() {
 		return siteInfoList;
 	}
 
-	public void setSiteInfoList(ArrayList<SiteInfo> siteInfoList) {
+	public void setSiteInfoList(ArrayList<Site> siteInfoList) {
 		this.siteInfoList = siteInfoList;
 	}
 	
-	public void addSiteInfo(SiteInfo info) {
-		this.siteInfoList.add(info);
+	public void addSiteInfo(Site site) {
+		this.siteInfoList.add(site);
 	}
 }

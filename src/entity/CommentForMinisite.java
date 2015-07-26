@@ -1,36 +1,36 @@
 package entity;
 
 import java.sql.Timestamp;
-import java.util.Date;
+import java.util.ArrayList;
 
 public class CommentForMinisite {
 	
-	private long commentsForSiteId;
+	private long commentsForMinisiteId;
 	private long accountUserId;
 	private String nickname;
-	private long siteId;
+	private String userIcon;
+	private long minisiteId;
 	private String content;
-	private int score;
-	private String picPath;
+	private ArrayList<String> picPath;
 	private Timestamp time;
 	
 	public CommentForMinisite(){
-		this.commentsForSiteId = -1;
+		this.commentsForMinisiteId = -1;
 		this.accountUserId = -1;
 		this.nickname = "";
-		this.siteId = -1;
+		this.userIcon = "";
+		this.minisiteId = -1;
 		this.content = "";
-		this.score = -1;
-		this.picPath = "";
 		this.time = new Timestamp(0);
-	}
-	
-	public long getCommentsForSiteId() {
-		return commentsForSiteId;
+		this.picPath = new ArrayList<String>();
 	}
 
-	public void setCommentsForSiteId(long commentsForSiteId) {
-		this.commentsForSiteId = commentsForSiteId;
+	public long getCommentsForMinisiteId() {
+		return commentsForMinisiteId;
+	}
+
+	public void setCommentsForMinisiteId(long commentsForMinisiteId) {
+		this.commentsForMinisiteId = commentsForMinisiteId;
 	}
 
 	public long getAccountUserId() {
@@ -40,21 +40,29 @@ public class CommentForMinisite {
 	public void setAccountUserId(long accountUserId) {
 		this.accountUserId = accountUserId;
 	}
-	
-	public String getNickName(){
+
+	public String getNickname() {
 		return nickname;
 	}
-	
-	public void setNickName(String nickname){
+
+	public void setNickname(String nickname) {
 		this.nickname = nickname;
 	}
 
-	public long getSiteId() {
-		return siteId;
+	public String getUserIcon() {
+		return userIcon;
 	}
 
-	public void setSiteId(long siteId) {
-		this.siteId = siteId;
+	public void setUserIcon(String userIcon) {
+		this.userIcon = userIcon;
+	}
+
+	public long getMinisiteId() {
+		return minisiteId;
+	}
+
+	public void setMinisiteId(long minisiteId) {
+		this.minisiteId = minisiteId;
 	}
 
 	public String getContent() {
@@ -65,19 +73,11 @@ public class CommentForMinisite {
 		this.content = content;
 	}
 
-	public int getScore() {
-		return score;
-	}
-
-	public void setScore(int score) {
-		this.score = score;
-	}
-
-	public String getPicPath() {
+	public ArrayList<String> getPicPath() {
 		return picPath;
 	}
 
-	public void setPicPath(String picPath) {
+	public void setPicPath(ArrayList<String> picPath) {
 		this.picPath = picPath;
 	}
 
@@ -88,5 +88,6 @@ public class CommentForMinisite {
 	public void setTime(Timestamp time) {
 		this.time = time;
 	}
-
+	
+	
 }
