@@ -12,6 +12,7 @@ public class ErrMsg extends RetObjBase {
 	
 	public static String SIGNUP_ERROR = "注册失败";
 	public static String UPDATE_USER_INFO_ERROR = "更新用户信息失败";
+	public static String UPLOAD_FILE_ERROR = "上传文件失败";
 
 	public static String TELEPHONE_NULL = "手机号为空";
 	public static String PASSWORD_NULL = "密码为空";
@@ -30,6 +31,8 @@ public class ErrMsg extends RetObjBase {
 	
 	public static String NUMBER_FORMAT_ERROR = "数字格式错误";
 	public static String TIME_FORMAT_ERROR = "时间格式错误";
+	
+	public static String NO_FILE_TO_UPLOAD = "没有上传文件";
 			
 	
 	private String msg;
