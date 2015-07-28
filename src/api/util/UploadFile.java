@@ -2,14 +2,17 @@ package api.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.security.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -17,6 +20,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 import api.ret.obj.ErrMsg;
 import api.ret.obj.RetCode;
+import api.ret.obj.UploadInfoList;
 import bll.HttpUtil;
 
 /**
@@ -26,8 +30,13 @@ import bll.HttpUtil;
 public class UploadFile extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
-	private static int MAX_FILE_SIZE = 50 * 1024;
-	private static int MAX_MEM_SIZE = 4 * 1024;
+	private static int MAX_FILE_SIZE = 100 * 1024;
+	private static int MAX_MEM_SIZE = 50 * 1024;
+	
+	private String IMAGE_TEMP_PATH_IN_SERVER;
+	private String IMAGE_DATA_PATH_IN_SERVER;
+	private String IMAGE_TEMP_PATH_IN_LOCAL;
+	private String IMAGE_DATA_PATH_IN_LOCAL;
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -35,6 +44,18 @@ public class UploadFile extends HttpServlet {
     public UploadFile() {
         super();
         // TODO Auto-generated constructor stub
+    }
+    
+    @Override
+    public void init() {
+    	this.IMAGE_TEMP_PATH_IN_SERVER =
+    			this.getServletContext().getRealPath("/") + "images/temp/";
+    	this.IMAGE_DATA_PATH_IN_SERVER =
+    			this.getServletContext().getRealPath("/") + "images/data/";
+    	this.IMAGE_TEMP_PATH_IN_LOCAL = 
+    			"/Users/Buffer/Documents/Code/eclipseEE workspace/huiwan/WebContent/images/temp/";
+    	this.IMAGE_DATA_PATH_IN_LOCAL = 
+    			"/Users/Buffer/Documents/Code/eclipseEE workspace/huiwan/WebContent/images/data/";
     }
 
 	/**
@@ -51,11 +72,13 @@ public class UploadFile extends HttpServlet {
 		
 		DiskFileItemFactory fileFactory = new DiskFileItemFactory();
 		fileFactory.setSizeThreshold(MAX_MEM_SIZE);
-		fileFactory.setRepository(new File(this.getServletContext().getRealPath("/") + "images/temp/"));
+		fileFactory.setRepository(
+				new File(this.IMAGE_TEMP_PATH_IN_SERVER));
 		
 		ServletFileUpload upload = new ServletFileUpload(fileFactory);
 		upload.setSizeMax(MAX_FILE_SIZE);
-				
+			
+		UploadInfoList uploadInfoList = new UploadInfoList();
 		try {
 			List<FileItem> fileItems = upload.parseRequest(request);
 			Iterator<FileItem> iter = fileItems.iterator();
@@ -71,10 +94,17 @@ public class UploadFile extends HttpServlet {
 					long sizeInBytes = item.getSize();
 										
 					// Write file
-					String filePath = this.getServletContext().getRealPath("/") + "images/data/";
-					System.out.println(filePath);
-					File file = new File(filePath + fileName);
-					item.write(file);					
+					File file = new File(this.IMAGE_DATA_PATH_IN_SERVER + fileName);
+					item.write(file);				
+					
+					// Calculate MD5 according to fileName, time and user info
+					// TODO need to add user info into md5
+					String uploadInfo = fileName + System.currentTimeMillis();
+					byte[] bytesOfUploadInfo = uploadInfo.getBytes("UTF-8");
+					MessageDigest md = MessageDigest.getInstance("MD5");
+					byte[] bytesOfMd5 = md.digest(bytesOfUploadInfo);
+					String md5 = (new HexBinaryAdapter()).marshal(bytesOfMd5);
+					uploadInfoList.addUploadInfo(fileName, md5);
 				}
 			}
 		} catch (Exception e) {
@@ -84,7 +114,7 @@ public class UploadFile extends HttpServlet {
 			return;
 		}
 		
-		HttpUtil.normalRespond(response, RetCode.SUCCESS, null);
+		HttpUtil.normalRespond(response, RetCode.SUCCESS, uploadInfoList);
 	}
 
 }
