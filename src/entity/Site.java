@@ -1,16 +1,20 @@
 package entity;
 
+import java.sql.Timestamp;
+import java.util.Date;
+
 public class Site {
 	
 	private long siteId;
 	private String name;
 	private String logoPath;
+	private String imgPath;
 	private String address;
 	private String rate;
 	private float coorsX;
 	private float coorsY;
 	private String keyValue;
-	private String descPath;
+	private String desc;
 	private long cityId;
 	private String englishName;
 	
@@ -18,12 +22,13 @@ public class Site {
 		this.siteId = -1;
 		this.name = "";
 		this.logoPath = "";
+		this.imgPath = "";
 		this.address = "";
 		this.rate = "";
 		this.coorsX = 0.0f;
 		this.coorsY = 0.0f;
 		this.keyValue = "";
-		this.descPath = "";
+		this.desc = "";
 		this.cityId = -1;
 		this.englishName = "";
 	}
@@ -50,6 +55,14 @@ public class Site {
 
 	public void setLogoPath(String logoPath) {
 		this.logoPath = logoPath;
+	}
+
+	public String getImgPath() {
+		return imgPath;
+	}
+
+	public void setImgPath(String imgPath) {
+		this.imgPath = imgPath;
 	}
 
 	public String getAddress() {
@@ -92,12 +105,12 @@ public class Site {
 		this.keyValue = keyValue;
 	}
 
-	public String getDescPath() {
-		return descPath;
+	public String getDesc() {
+		return desc;
 	}
 
-	public void setDescPath(String descPath) {
-		this.descPath = descPath;
+	public void setDesc(String desc) {
+		this.desc = desc;
 	}
 
 	public long getCityId() {

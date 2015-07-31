@@ -1,5 +1,9 @@
 package entity;
 
+import java.sql.Timestamp;
+import java.util.Date;
+
+
 public class Minisite {
 
 	private long minisiteId;
@@ -7,7 +11,7 @@ public class Minisite {
 	private String name;
 	private String logoPath;
 	private String address;
-	private String descPath;
+	private String desc;
 	private float coorsX;
 	private float coorsY;
 	private String keyValue;
@@ -21,7 +25,7 @@ public class Minisite {
 		this.name = "";
 		this.logoPath = "";
 		this.address = "";
-		this.descPath = "";
+		this.desc = "";
 		this.coorsX = 0.0f;
 		this.coorsY = 0.0f;
 		this.keyValue = "";
@@ -70,12 +74,12 @@ public class Minisite {
 		this.address = address;
 	}
 
-	public String getDescPath() {
-		return descPath;
+	public String getDesc() {
+		return desc;
 	}
 
-	public void setDescPath(String descPath) {
-		this.descPath = descPath;
+	public void setDesc(String desc) {
+		this.desc = desc;
 	}
 
 	public float getCoorsX() {

@@ -2,7 +2,6 @@ package api.util;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.security.*;
@@ -21,6 +20,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import api.ret.obj.ErrMsg;
 import api.ret.obj.RetCode;
 import api.ret.obj.UploadInfoList;
+import bll.BizUtil;
 import bll.HttpUtil;
 
 /**
@@ -49,13 +49,13 @@ public class UploadFile extends HttpServlet {
     @Override
     public void init() {
     	this.IMAGE_TEMP_PATH_IN_SERVER =
-    			this.getServletContext().getRealPath("/") + "images/temp/";
+    			this.getServletContext().getRealPath("/") + "data/temp/";
     	this.IMAGE_DATA_PATH_IN_SERVER =
-    			this.getServletContext().getRealPath("/") + "images/data/";
+    			this.getServletContext().getRealPath("/") + "data/picture/";
     	this.IMAGE_TEMP_PATH_IN_LOCAL = 
-    			"/Users/Buffer/Documents/Code/eclipseEE workspace/huiwan/WebContent/images/temp/";
+    			"/Users/Buffer/Documents/Code/eclipseEE workspace/huiwan/WebContent/data/temp/";
     	this.IMAGE_DATA_PATH_IN_LOCAL = 
-    			"/Users/Buffer/Documents/Code/eclipseEE workspace/huiwan/WebContent/images/data/";
+    			"/Users/Buffer/Documents/Code/eclipseEE workspace/huiwan/WebContent/data/picture/";
     }
 
 	/**
@@ -85,6 +85,7 @@ public class UploadFile extends HttpServlet {
 			
 			while(iter.hasNext()) {
 				FileItem item = (FileItem) iter.next();
+				System.out.println(item.getFieldName());
 				if (!item.isFormField()) {
 					// Get upload parameters
 					String fieldName = item.getFieldName();
@@ -98,12 +99,7 @@ public class UploadFile extends HttpServlet {
 					item.write(file);				
 					
 					// Calculate MD5 according to fileName, time and user info
-					// TODO need to add user info into md5
-					String uploadInfo = fileName + System.currentTimeMillis();
-					byte[] bytesOfUploadInfo = uploadInfo.getBytes("UTF-8");
-					MessageDigest md = MessageDigest.getInstance("MD5");
-					byte[] bytesOfMd5 = md.digest(bytesOfUploadInfo);
-					String md5 = (new HexBinaryAdapter()).marshal(bytesOfMd5);
+					String md5 = BizUtil.calcMd5(fileName, uid, siteId);
 					uploadInfoList.addUploadInfo(fileName, md5);
 				}
 			}

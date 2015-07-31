@@ -1,11 +1,17 @@
 package bll;
 
+import java.security.MessageDigest;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
-import api.ret.obj.CityList;
+import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
+
+import api.ret.obj.CityIdList;
+import api.ret.obj.CityInfoList;
 import api.ret.obj.MinisiteCommentList;
 import api.ret.obj.MinisiteInfoList;
+import api.ret.obj.PictureForMinisiteList;
+import api.ret.obj.PictureForSiteList;
 import api.ret.obj.PicturePathList;
 import api.ret.obj.MinisiteIdList;
 import api.ret.obj.SiteCommentList;
@@ -19,6 +25,8 @@ import entity.City;
 import entity.CommentForMinisite;
 import entity.CommentForSite;
 import entity.Minisite;
+import entity.PictureForMinisite;
+import entity.PictureForSite;
 import entity.Site;
 
 public class BizUtil {
@@ -125,17 +133,38 @@ public class BizUtil {
 	}
 	
 	/**
-	 * Get all the cities' information
-	 * @return
+	 * 
+	 * @param size
+	 * @param offset
+	 * @return list of city id
 	 */
-	public static CityList getCityList() {
+	public static CityIdList getCityList(long size, long offset) {
 		
-		ArrayList<City> list = DBUtil.getCityList();
+		ArrayList<Long> list = DBUtil.getCityList(size, offset);
 		
-		CityList cityList = new CityList();
-		cityList.setCityList(list);
+		CityIdList cityIdList = new CityIdList();
+		cityIdList.setCityList(list);
 		
-		return cityList;
+		return cityIdList;
+	}
+	
+	/**
+	 * 
+	 * @param cityIds
+	 * @return cities' information in the cityIds
+	 */
+	public static CityInfoList getCitiesInfo(long[] cityIds) {
+		
+		CityInfoList cityInfoList = new CityInfoList();
+		for	(int i = 0; i < cityIds.length; i++) {
+			City city = DBUtil.getCityInfo(cityIds[i]);
+			if (city == null) {
+				continue;
+			}
+			cityInfoList.addCityInfo(city);
+		}
+		
+		return cityInfoList;
 	}
 	
 	/**
@@ -348,7 +377,15 @@ public class BizUtil {
 	 */
 	public static int commentMinisite(long minisiteId, String content, long uid, ArrayList<String> picPath) {
 		
-		int ret = DBUtil.commentMinisite(minisiteId, content, uid, new Timestamp(System.currentTimeMillis()), picPath);
+		ArrayList<PictureForMinisite> pictures = new ArrayList<PictureForMinisite>();
+		for (int i = 0; i < picPath.size(); i++) {
+			PictureForSite picture = new PictureForSite();
+			picture.setTime(new Timestamp(System.currentTimeMillis()));
+			picture.setSize(0);
+			picture.setPicPath(picPath.get(i));
+		}
+		
+		int ret = DBUtil.commentMinisite(minisiteId, content, uid, new Timestamp(System.currentTimeMillis()), pictures);
 		
 		return ret;
 	}
@@ -365,7 +402,15 @@ public class BizUtil {
 	 */
 	public static int commentSite(long siteId, String content, int score, long uid, ArrayList<String> picPath) {
 		
-		int ret = DBUtil.commentSite(siteId, content, score, uid, new Timestamp(System.currentTimeMillis()), picPath);
+		ArrayList<PictureForSite> pictures = new ArrayList<PictureForSite>();
+		for (int i = 0; i < picPath.size(); i++) {
+			PictureForSite picture = new PictureForSite();
+			picture.setTime(new Timestamp(System.currentTimeMillis()));
+			picture.setSize(0);
+			picture.setPicPath(picPath.get(i));
+		}
+		
+		int ret = DBUtil.commentSite(siteId, content, score, uid, new Timestamp(System.currentTimeMillis()), pictures);
 		
 		return ret;
 	}
@@ -373,34 +418,55 @@ public class BizUtil {
 	/**
 	 * 
 	 * @param siteId
-	 * @return picture path list of the site
+	 * @return picture list of the site
 	 */
-	public static PicturePathList GetPictureForSiteBySiteId(long siteId) {
+	public static PictureForSiteList GetPictureForSiteBySiteId(long siteId) {
 		
-		PicturePathList picturePathList = new PicturePathList();
+		PictureForSiteList pictureList = new PictureForSiteList();
 		
-		ArrayList<String> list = DBUtil.getPictureForSiteBySiteId(siteId);
-		for (String path : list) {
-			picturePathList.addPath(path);
+		ArrayList<PictureForSite> list = DBUtil.getPictureForSiteBySiteId(siteId);
+		for (PictureForSite picture : list) {
+			pictureList.addPicture(picture);
 		}
 		
-		return picturePathList;
+		return pictureList;
 	}
 	
 	/**
 	 * 
 	 * @param minisiteId
-	 * @return picture path list of the minisite
+	 * @return picture list of the minisite
 	 */
-	public static PicturePathList GetPictureForMinisiteByMinisiteId(long minisiteId) {
+	public static PictureForMinisiteList GetPictureForMinisiteByMinisiteId(long minisiteId) {
 		
-		PicturePathList picturePathList = new PicturePathList();
+		PictureForMinisiteList pictureList = new PictureForMinisiteList();
 		
-		ArrayList<String> list = DBUtil.getPictureForMinisiteByMinisiteId(minisiteId);
-		for (String path : list) {
-			picturePathList.addPath(path);
+		ArrayList<PictureForMinisite> list = DBUtil.getPictureForMinisiteByMinisiteId(minisiteId);
+		for (PictureForMinisite picture : list) {
+			pictureList.addPicture(picture);
 		}
 		
-		return picturePathList;
+		return pictureList;
+	}
+	
+	public static SiteIdList getCommentSiteList(long uid, long size, long offset) {
+		
+		ArrayList<Long> list = DBUtil.getSiteListByUserId(uid, size, offset);
+		
+		SiteIdList siteList = new SiteIdList();
+		siteList.setSiteIdList(list);
+		
+		return siteList;	
+	}
+	
+	public static String calcMd5(String fileName, long uid, long siteId) throws Exception{
+		
+		String uploadInfo = fileName + uid + siteId + System.currentTimeMillis();
+		byte[] bytesOfUploadInfo = uploadInfo.getBytes("UTF-8");
+		MessageDigest md = MessageDigest.getInstance("MD5");
+		byte[] bytesOfMd5 = md.digest(bytesOfUploadInfo);
+		String md5 = (new HexBinaryAdapter()).marshal(bytesOfMd5);
+		
+		return md5;
 	}
 }

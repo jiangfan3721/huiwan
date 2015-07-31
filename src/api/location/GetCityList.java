@@ -7,7 +7,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import api.ret.obj.CityList;
+import api.ret.obj.CityIdList;
+import api.ret.obj.ErrMsg;
 import api.ret.obj.RetCode;
 import bll.BizUtil;
 import bll.HttpUtil;
@@ -32,9 +33,35 @@ public class GetCityList extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-		CityList cityList = BizUtil.getCityList();
+		String sizeStr = request.getParameter("size");
+		String offsetStr = request.getParameter("offset");
 		
-		HttpUtil.normalRespond(response, RetCode.SUCCESS, cityList);
+		if (sizeStr == null || sizeStr.isEmpty()) {
+			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, 
+					ErrMsg.SIZE_NULL);
+			return;
+		}
+		
+		if (offsetStr == null || offsetStr.isEmpty()) {
+			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, 
+					ErrMsg.OFFSET_NULL);
+			return;
+		}
+		
+		long size = 0, offset = 0;
+		
+		try {
+			size = Long.parseLong(sizeStr);
+			offset = Long.parseLong(offsetStr);
+		} catch (NumberFormatException e) {
+			System.out.println("Error while parse size/offset to long");
+			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, ErrMsg.NUMBER_FORMAT_ERROR);
+			return;
+		}
+		
+		CityIdList cityIdList = BizUtil.getCityList(size, offset);
+		
+		HttpUtil.normalRespond(response, RetCode.SUCCESS, cityIdList);
 	}
 
 	/**

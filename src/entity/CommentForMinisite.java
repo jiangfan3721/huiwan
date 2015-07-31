@@ -1,7 +1,9 @@
 package entity;
 
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.ArrayList;
+import entity.PictureForMinisite;
 
 public class CommentForMinisite {
 	
@@ -11,7 +13,7 @@ public class CommentForMinisite {
 	private String userIcon;
 	private long minisiteId;
 	private String content;
-	private ArrayList<String> picPath;
+	private ArrayList<PictureForMinisite> pic;
 	private Timestamp time;
 	
 	public CommentForMinisite(){
@@ -22,7 +24,7 @@ public class CommentForMinisite {
 		this.minisiteId = -1;
 		this.content = "";
 		this.time = new Timestamp(0);
-		this.picPath = new ArrayList<String>();
+		this.pic = new ArrayList<PictureForMinisite>();
 	}
 
 	public long getCommentsForMinisiteId() {
@@ -73,12 +75,12 @@ public class CommentForMinisite {
 		this.content = content;
 	}
 
-	public ArrayList<String> getPicPath() {
-		return picPath;
+	public ArrayList<PictureForMinisite> getPic() {
+		return pic;
 	}
 
-	public void setPicPath(ArrayList<String> picPath) {
-		this.picPath = picPath;
+	public void setPic(ArrayList<PictureForMinisite> pic) {
+		this.pic = pic;
 	}
 
 	public Timestamp getTime() {

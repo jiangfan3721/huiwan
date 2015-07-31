@@ -1,7 +1,9 @@
 package entity;
 
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.ArrayList;
+import entity.PictureForSite;
 
 public class CommentForSite {
 	
@@ -12,7 +14,7 @@ public class CommentForSite {
 	private long siteId;
 	private String content;
 	private int score;
-	private ArrayList<String> picPath;
+	private ArrayList<PictureForSite> pic;
 	private Timestamp time;
 	
 	public CommentForSite(){
@@ -24,7 +26,7 @@ public class CommentForSite {
 		this.content = "";
 		this.score = -1;
 		this.time = new Timestamp(0);
-		this.picPath = new ArrayList<String>();
+		this.pic = new ArrayList<PictureForSite>();
 	}
 
 	public long getCommentsForSiteId() {
@@ -83,12 +85,12 @@ public class CommentForSite {
 		this.score = score;
 	}
 
-	public ArrayList<String> getPicPath() {
-		return picPath;
+	public ArrayList<PictureForSite> getPic() {
+		return pic;
 	}
 
-	public void setPicPath(ArrayList<String> picPath) {
-		this.picPath = picPath;
+	public void setPic(ArrayList<PictureForSite> pic) {
+		this.pic = pic;
 	}
 
 	public Timestamp getTime() {

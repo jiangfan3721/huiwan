@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import api.ret.obj.ErrMsg;
-import api.ret.obj.PicturePathList;
+import api.ret.obj.PictureForMinisiteList;
 import api.ret.obj.RetCode;
 import bll.BizUtil;
 import bll.HttpUtil;
@@ -50,8 +50,8 @@ public class GetPictureForMinisiteByMinisiteId extends HttpServlet {
 			return;
 		}
 
-		PicturePathList pathList = BizUtil.GetPictureForMinisiteByMinisiteId(minisiteId);
-		HttpUtil.normalRespond(response, RetCode.SUCCESS, pathList);
+		PictureForMinisiteList pictures = BizUtil.GetPictureForMinisiteByMinisiteId(minisiteId);
+		HttpUtil.normalRespond(response, RetCode.SUCCESS, pictures);
 	}
 
 	/**

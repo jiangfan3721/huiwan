@@ -1,4 +1,4 @@
-package api.location;
+package api.account;
 
 import java.io.IOException;
 import javax.servlet.ServletException;
@@ -8,22 +8,22 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import api.ret.obj.ErrMsg;
-import api.ret.obj.PictureForSiteList;
 import api.ret.obj.RetCode;
+import api.ret.obj.SiteIdList;
 import bll.BizUtil;
 import bll.HttpUtil;
 
 /**
- * Servlet implementation class GetPictureForSiteBySiteId
+ * Servlet implementation class GetCommentSiteList
  */
-@WebServlet("/api/location/getPictureForSiteBySiteId")
-public class GetPictureForSiteBySiteId extends HttpServlet {
+@WebServlet("/api/account/getCommentSiteList")
+public class GetCommentSiteList extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public GetPictureForSiteBySiteId() {
+    public GetCommentSiteList() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -32,26 +32,44 @@ public class GetPictureForSiteBySiteId extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-		String siteIdStr = request.getParameter("siteId");
 		
-		if (siteIdStr == null || siteIdStr.isEmpty()) {
+		String uidStr = request.getParameter("uid");
+		String sizeStr = request.getParameter("size");
+		String offsetStr = request.getParameter("offset");
+		
+		if (uidStr == null || uidStr.isEmpty()) {
 			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, 
-					ErrMsg.SITE_ID_NULL);
+					ErrMsg.TELEPHONE_NULL);
 			return;
 		}
 		
-		long siteId = -1;
+		if (sizeStr == null || sizeStr.isEmpty()) {
+			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, 
+					ErrMsg.SIZE_NULL);
+			return;
+		}
+		
+		if (offsetStr == null || offsetStr.isEmpty()) {
+			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, 
+					ErrMsg.OFFSET_NULL);
+			return;
+		}
+		
+		long uid = -1, size = 0, offset = 0;
+		
 		try {
-			siteId = Long.parseLong(siteIdStr);
+			uid = Long.parseLong(uidStr);
+			size = Long.parseLong(sizeStr);
+			offset = Long.parseLong(offsetStr);
 		} catch (NumberFormatException e) {
-			System.out.println("Error while parse " + siteIdStr + " to long.");
+			System.out.println("Error while parse uid/size/offset to long");
 			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, ErrMsg.NUMBER_FORMAT_ERROR);
 			return;
 		}
-
-		PictureForSiteList pictures = BizUtil.GetPictureForSiteBySiteId(siteId);
-		HttpUtil.normalRespond(response, RetCode.SUCCESS, pictures);
+		
+		SiteIdList siteIdList = BizUtil.getCommentSiteList(uid, size, offset);
+		
+		HttpUtil.normalRespond(response, RetCode.SUCCESS, siteIdList);
 	}
 
 	/**

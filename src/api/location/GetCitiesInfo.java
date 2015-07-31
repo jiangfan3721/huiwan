@@ -7,23 +7,23 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import api.ret.obj.CityInfoList;
 import api.ret.obj.ErrMsg;
-import api.ret.obj.PictureForSiteList;
 import api.ret.obj.RetCode;
 import bll.BizUtil;
 import bll.HttpUtil;
 
 /**
- * Servlet implementation class GetPictureForSiteBySiteId
+ * Servlet implementation class GetCitiesInfo
  */
-@WebServlet("/api/location/getPictureForSiteBySiteId")
-public class GetPictureForSiteBySiteId extends HttpServlet {
+@WebServlet("/api/location/getCitiesInfo")
+public class GetCitiesInfo extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public GetPictureForSiteBySiteId() {
+    public GetCitiesInfo() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -33,25 +33,29 @@ public class GetPictureForSiteBySiteId extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-		String siteIdStr = request.getParameter("siteId");
-		
-		if (siteIdStr == null || siteIdStr.isEmpty()) {
+		String cityIdsStr = request.getParameter("cityIds");
+		if (cityIdsStr == null || cityIdsStr.isEmpty()) {
 			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, 
-					ErrMsg.SITE_ID_NULL);
+					ErrMsg.CITY_IDS_NULL);
 			return;
+		}
+		String[] cityIdStrArray = cityIdsStr.split(";");
+		
+		long[] cityIds = new long[cityIdStrArray.length];
+		
+		for (int i = 0; i < cityIdStrArray.length; i++) {
+			try {
+				cityIds[i] = Long.parseLong(cityIdStrArray[i]);
+			} catch (NumberFormatException e) {
+				System.out.println("Error while parse " + cityIdStrArray[i] + " to long");
+				HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, ErrMsg.NUMBER_FORMAT_ERROR);
+				return;
+			}
 		}
 		
-		long siteId = -1;
-		try {
-			siteId = Long.parseLong(siteIdStr);
-		} catch (NumberFormatException e) {
-			System.out.println("Error while parse " + siteIdStr + " to long.");
-			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, ErrMsg.NUMBER_FORMAT_ERROR);
-			return;
-		}
-
-		PictureForSiteList pictures = BizUtil.GetPictureForSiteBySiteId(siteId);
-		HttpUtil.normalRespond(response, RetCode.SUCCESS, pictures);
+		CityInfoList cityInfoList = BizUtil.getCitiesInfo(cityIds);
+		
+		HttpUtil.normalRespond(response, RetCode.SUCCESS, cityInfoList);
 	}
 
 	/**
