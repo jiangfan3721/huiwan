@@ -39,7 +39,7 @@ public class GetSiteList extends HttpServlet {
 		
 		if (cityIdStr == null || cityIdStr.isEmpty()) {
 			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, 
-					ErrMsg.TELEPHONE_NULL);
+					ErrMsg.CITY_ID_NULL);
 			return;
 		}
 		

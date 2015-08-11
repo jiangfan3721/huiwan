@@ -24,6 +24,7 @@ public class ErrMsg extends RetObjBase {
 	public static String OFFSET_NULL = "偏移量为空";
 	public static String SITE_IDS_NULL = "目的地列表为空";
 	public static String CITY_IDS_NULL = "城市列表为空";
+	public static String CITY_ID_NULL = "城市ID为空";
 	public static String MINISITE_ID_NULL = "景点ID为空";
 	public static String START_TIME_NULL = "开始时间为空";
 	public static String END_TIME_NULL = "结束时间为空";

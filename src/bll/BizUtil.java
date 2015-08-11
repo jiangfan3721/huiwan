@@ -379,10 +379,11 @@ public class BizUtil {
 		
 		ArrayList<PictureForMinisite> pictures = new ArrayList<PictureForMinisite>();
 		for (int i = 0; i < picPath.size(); i++) {
-			PictureForSite picture = new PictureForSite();
+			PictureForMinisite picture = new PictureForMinisite();
 			picture.setTime(new Timestamp(System.currentTimeMillis()));
 			picture.setSize(0);
 			picture.setPicPath(picPath.get(i));
+			pictures.add(picture);
 		}
 		
 		int ret = DBUtil.commentMinisite(minisiteId, content, uid, new Timestamp(System.currentTimeMillis()), pictures);
@@ -408,6 +409,7 @@ public class BizUtil {
 			picture.setTime(new Timestamp(System.currentTimeMillis()));
 			picture.setSize(0);
 			picture.setPicPath(picPath.get(i));
+			pictures.add(picture);
 		}
 		
 		int ret = DBUtil.commentSite(siteId, content, score, uid, new Timestamp(System.currentTimeMillis()), pictures);
@@ -459,7 +461,7 @@ public class BizUtil {
 		return siteList;	
 	}
 	
-	public static String calcMd5(String fileName, long uid, long siteId) throws Exception{
+	public static String calcMd5(String fileName, long uid, long siteId) throws Exception {
 		
 		String uploadInfo = fileName + uid + siteId + System.currentTimeMillis();
 		byte[] bytesOfUploadInfo = uploadInfo.getBytes("UTF-8");
@@ -469,4 +471,14 @@ public class BizUtil {
 		
 		return md5;
 	}
+	
+	public static String getExtensionName(String filename) {   
+        if ((filename != null) && (filename.length() > 0)) {   
+            int dot = filename.lastIndexOf('.');   
+            if ((dot >-1) && (dot < (filename.length() - 1))) {   
+                return filename.substring(dot + 1);   
+            }   
+        }   
+        return filename;   
+    } 
 }

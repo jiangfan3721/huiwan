@@ -33,10 +33,10 @@ public class UploadFile extends HttpServlet {
 	private static int MAX_FILE_SIZE = 100 * 1024;
 	private static int MAX_MEM_SIZE = 50 * 1024;
 	
-	private String IMAGE_TEMP_PATH_IN_SERVER;
-	private String IMAGE_DATA_PATH_IN_SERVER;
-	private String IMAGE_TEMP_PATH_IN_LOCAL;
-	private String IMAGE_DATA_PATH_IN_LOCAL;
+	private String ROOT_IN_SERVER;
+	private String ROOT_IN_LOCAL;
+	private String TEMP_PATH = "data/temp/";
+	private String DATA_PATH = "data/picture/";
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -48,14 +48,8 @@ public class UploadFile extends HttpServlet {
     
     @Override
     public void init() {
-    	this.IMAGE_TEMP_PATH_IN_SERVER =
-    			this.getServletContext().getRealPath("/") + "data/temp/";
-    	this.IMAGE_DATA_PATH_IN_SERVER =
-    			this.getServletContext().getRealPath("/") + "data/picture/";
-    	this.IMAGE_TEMP_PATH_IN_LOCAL = 
-    			"/Users/Buffer/Documents/Code/eclipseEE workspace/huiwan/WebContent/data/temp/";
-    	this.IMAGE_DATA_PATH_IN_LOCAL = 
-    			"/Users/Buffer/Documents/Code/eclipseEE workspace/huiwan/WebContent/data/picture/";
+    	this.ROOT_IN_LOCAL = "/Users/Buffer/Documents/Code/eclipseEE workspace/huiwan/WebContent/";
+    	this.ROOT_IN_SERVER = this.getServletContext().getRealPath("/");
     }
 
 	/**
@@ -73,11 +67,14 @@ public class UploadFile extends HttpServlet {
 		DiskFileItemFactory fileFactory = new DiskFileItemFactory();
 		fileFactory.setSizeThreshold(MAX_MEM_SIZE);
 		fileFactory.setRepository(
-				new File(this.IMAGE_TEMP_PATH_IN_SERVER));
+				new File(this.ROOT_IN_SERVER + this.TEMP_PATH));
 		
 		ServletFileUpload upload = new ServletFileUpload(fileFactory);
 		upload.setSizeMax(MAX_FILE_SIZE);
 			
+		long uid = -1, siteId = -1;
+		String type = "";
+		FileItem fileItem = null;
 		UploadInfoList uploadInfoList = new UploadInfoList();
 		try {
 			List<FileItem> fileItems = upload.parseRequest(request);
@@ -85,24 +82,50 @@ public class UploadFile extends HttpServlet {
 			
 			while(iter.hasNext()) {
 				FileItem item = (FileItem) iter.next();
-				System.out.println(item.getFieldName());
 				if (!item.isFormField()) {
-					// Get upload parameters
-					String fieldName = item.getFieldName();
-					String fileName = item.getName();
-					String contentType = item.getContentType();
-					boolean isInMemory = item.isInMemory();
-					long sizeInBytes = item.getSize();
-										
-					// Write file
-					File file = new File(this.IMAGE_DATA_PATH_IN_SERVER + fileName);
-					item.write(file);				
+					fileItem = item;
+				} else if (item.getFieldName().equals("uid")){
+					uid = Long.parseLong(item.getString());
+				} else if (item.getFieldName().equals("siteId")) {
+					siteId = Long.parseLong(item.getString());
+				} else if (item.getFieldName().equals("type")) {
+					type = item.getString();
+				} else if (item.getFieldName().equals("minisiteId")) {
 					
-					// Calculate MD5 according to fileName, time and user info
-					String md5 = BizUtil.calcMd5(fileName, uid, siteId);
-					uploadInfoList.addUploadInfo(fileName, md5);
 				}
 			}
+		} catch (Exception e) {
+			System.out.println("Error while parsing request.");
+			System.err.println(e);
+			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, ErrMsg.UPLOAD_FILE_ERROR);
+			return;
+		}
+		
+		if (fileItem == null ||uid == -1 || siteId == -1 || (!type.equals("site") && !type.equals("minisite"))) {
+			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, ErrMsg.UPLOAD_FILE_ERROR);
+		}
+		
+		// Get upload parameters
+		String fieldName = fileItem.getFieldName();
+		String fileName = fileItem.getName();
+		String contentType = fileItem.getContentType();
+		boolean isInMemory = fileItem.isInMemory();
+		long sizeInBytes = fileItem.getSize();
+							
+		try {
+			File dir = new File(this.ROOT_IN_SERVER + this.DATA_PATH + "id_" + siteId);
+			if (!dir.exists() && !dir.isDirectory()) {
+				dir.mkdir();
+			}
+			
+			// Calculate MD5 according to fileName, time and user info
+			String md5 = BizUtil.calcMd5(fileName, uid, siteId);
+			
+			// Write file
+			File file = new File(dir+ "/" + md5 + "." + BizUtil.getExtensionName(fileName));
+			fileItem.write(file);					
+			
+			uploadInfoList.addUploadInfo(fileName, this.DATA_PATH + "id_" + siteId + "/" + file.getName());
 		} catch (Exception e) {
 			System.out.println("Error while writing file.");
 			System.err.println(e);

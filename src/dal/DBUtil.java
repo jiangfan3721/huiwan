@@ -370,6 +370,7 @@ public class DBUtil {
 				result.setCityInformation(rs.getString(3));
 				result.setEnglishName(rs.getString(4));
 				result.setPicPath(rs.getString(5));
+				result.setCity_id(cityId);
 			}
 			else{
 				result = null;
@@ -478,7 +479,7 @@ public class DBUtil {
 		PreparedStatement stmt = null;
         
 		Connection conn = DBUtil.getConnection();
-		String sql = "select name, logo_path, address, coors_x, coors_y, 'desc', key_value, music_path, lrc_path, english_name "+
+		String sql = "select name, logo_path, address, coors_x, coors_y, `desc`, key_value, music_path, lrc_path, english_name, Site_site_id "+
 				"from minisite "+
 				"where minisite_id = ?;";
 		
@@ -500,7 +501,8 @@ public class DBUtil {
 				result.setMusicPath(rs.getString(8));
 				result.setIrcPath(rs.getString(9));
 				result.setEnglishName(rs.getString(10));
-				result.setSiteId(minisiteId);
+				result.setSiteId(rs.getLong(11));
+				result.setMinisiteId(minisiteId);
 			}
 			else{
 				result = null;
@@ -666,6 +668,7 @@ public class DBUtil {
 				t.setNickname(rs.getString(5));
 				t.setUserIcon(rs.getString(6));
 				t.setCommentsForSiteId(rs.getLong(7));
+				t.setSiteId(siteId);
 				
 				result.add(t);
 			}
@@ -708,6 +711,7 @@ public class DBUtil {
 			stmt.setFloat(5, size);
 			stmt.setTimestamp(6, photoTime);
 			
+			System.out.println(stmt.toString());
 			stmt.executeUpdate();
 			
 			DBUtil.close(conn, stmt, null);
@@ -729,7 +733,7 @@ public class DBUtil {
 		PreparedStatement stmt = null;
         
 		Connection conn = DBUtil.getConnection();
-		String sql = "select picture_path, size, time "+ 
+		String sql = "select picture_path, size, time, pictureForCommentsForSite_id, CommentsForSite_Account_user_id, CommentsForSite_Site_site_id "+ 
 					"from pictureforcommentsforsite "+
 					"where CommentsForSite_commentsForSite_id = ?; ";
 		
@@ -746,6 +750,9 @@ public class DBUtil {
 				t.setPicPath(rs.getString(1));
 				t.setSize(rs.getFloat(2));
 				t.setTime(rs.getTimestamp(3));
+				t.setPictureForSiteId(rs.getLong(4));
+				t.setUserId(rs.getLong(5));
+				t.setSiteId(rs.getLong(6));
 				t.setCommentForSiteId(commentId);
 				
 				result.add(t);
@@ -1137,18 +1144,20 @@ public class DBUtil {
         
 		Connection conn = DBUtil.getConnection();
 		String sql = "INSERT INTO commentsforminisite(Account_user_id, Minisite_minisite_id, content, time) "
-				+ "VALUES(?, ?, ?, ?) select @@IDENTITY;";
+				+ "VALUES(?, ?, ?, ?)";
 		
 		long commentId = -1;
 		
 		try {
-			stmt = conn.prepareStatement(sql);
+			stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 			stmt.setLong(1, uid);
 			stmt.setLong(2, minisiteId);
 			stmt.setString(3, content);
 			stmt.setTimestamp(4, commentTime);
 			
-			ResultSet rs = stmt.executeQuery();
+			stmt.executeUpdate();
+			//ResultSet rs = stmt.executeQuery();
+			ResultSet rs = stmt.getGeneratedKeys();
 			
 			if (rs.next()){
 				commentId = rs.getLong(1);
@@ -1184,22 +1193,24 @@ public class DBUtil {
 	public static int commentSite(long siteId, String content, int score, long uid, Timestamp commentTime, ArrayList<PictureForSite> pic) {
 		
 		PreparedStatement stmt = null;
-        
+		        
 		Connection conn = DBUtil.getConnection();
 		String sql = "INSERT INTO commentsforsite(Account_user_id, Site_site_id, content, time, score) "
-				+ "VALUES(?, ?, ?, ?, ?) select @@IDENTITY;";
+				+ "VALUES(?, ?, ?, ?, ?)";
 		
 		long commentId = -1;
 		
 		try {
-			stmt = conn.prepareStatement(sql);
+			stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 			stmt.setLong(1, uid);
 			stmt.setLong(2, siteId);
 			stmt.setString(3, content);
 			stmt.setTimestamp(4, commentTime);
 			stmt.setInt(5, score);
-			
-			ResultSet rs = stmt.executeQuery();
+						
+			stmt.executeUpdate();
+			//ResultSet rs = stmt.executeQuery();
+			ResultSet rs = stmt.getGeneratedKeys();
 			
 			if (rs.next()){
 				commentId = rs.getLong(1);
@@ -1211,9 +1222,11 @@ public class DBUtil {
 			DBUtil.close(conn, stmt, rs);
 		} catch (SQLException e) {
 			System.out.println("Something error in commentSite");
+			System.out.println(e.toString());
 			return -1;
 		}
 		
+		System.out.println(pic.size());
 		for (int i = 0; i < pic.size(); i++)
 		{
 			DBUtil.addPictureForSite(pic.get(i).getPicPath(), commentId, uid, siteId, pic.get(i).getSize(), pic.get(i).getTime());
@@ -1304,7 +1317,7 @@ public class DBUtil {
 		PreparedStatement stmt = null;
         
 		Connection conn = DBUtil.getConnection();
-		String sql = "select Site_site_id from CommentsForSite "+
+		String sql = "select Site_site_id from commentsforsite "+
 					"where Account_user_id = ? " +
 					"limit ?, ?;";
 		
@@ -1315,7 +1328,7 @@ public class DBUtil {
 			stmt.setLong(1, userId);
 			stmt.setLong(2, offset);
 			stmt.setLong(3, size);
-			
+						
 			ResultSet rs = stmt.executeQuery();
 			
 			while(rs.next()) {
