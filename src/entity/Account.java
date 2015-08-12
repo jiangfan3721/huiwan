@@ -10,6 +10,7 @@ public class Account {
 	private String password;
 	private String nickname;
 	private String userIcon;
+	private String background;
 	private Timestamp regTime;
 	private String sex;
 	private String state;
@@ -23,6 +24,7 @@ public class Account {
 		this.password = "";
 		this.nickname = "";
 		this.userIcon = "";
+		this.background = "";
 		this.regTime = new Timestamp(0);
 		this.sex = "";
 		this.state = "";
@@ -95,6 +97,12 @@ public class Account {
 	}
 	public void setSelfIntroduction(String selfIntroduction) {
 		this.selfIntroduction = selfIntroduction;
+	}
+	public String getBackground() {
+		return background;
+	}
+	public void setBackground(String background) {
+		this.background = background;
 	}
 	
 	

@@ -10,6 +10,7 @@ public class UserInfo extends RetObjBase {
 	private String password;
 	private String nickname;
 	private String userIcon;
+	private String background;
 	private Timestamp regTime;
 	private String sex;
 	private String state;
@@ -23,6 +24,7 @@ public class UserInfo extends RetObjBase {
 		this.password = "";
 		this.nickname = "";
 		this.userIcon = "";
+		this.background = "";
 		this.regTime = new Timestamp(0);
 		this.sex = "";
 		this.state = "";
@@ -30,7 +32,7 @@ public class UserInfo extends RetObjBase {
 		this.selfIntroduction = "";
 	}
 	
-	public UserInfo(long userId, String realName, String telephone, String password, String nickname, String userIcon,
+	public UserInfo(long userId, String realName, String telephone, String password, String nickname, String userIcon, String background,
 			Timestamp regTime, String sex, String state, Timestamp birthday, String selfIntroduction) {
 		super();
 		this.userId = userId;
@@ -39,6 +41,7 @@ public class UserInfo extends RetObjBase {
 		this.password = password;
 		this.nickname = nickname;
 		this.userIcon = userIcon;
+		this.background = background;
 		this.regTime = regTime;
 		this.sex = sex;
 		this.state = state;
@@ -111,5 +114,11 @@ public class UserInfo extends RetObjBase {
 	}
 	public void setSelfIntroduction(String selfIntroduction) {
 		this.selfIntroduction = selfIntroduction;
+	}
+	public String getBackground() {
+		return background;
+	}
+	public void setBackground(String background) {
+		this.background = background;
 	}
 }

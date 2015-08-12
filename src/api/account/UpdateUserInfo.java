@@ -41,6 +41,8 @@ public class UpdateUserInfo extends HttpServlet {
 		String sex = request.getParameter("sex");
 		String birthdayStr = request.getParameter("birthday");
 		String selfIntroduction = request.getParameter("selfIntroduction");
+		String userIcon = request.getParameter("userIcon");
+		String background = request.getParameter("background");
 		
 		if (uidStr == null || uidStr.isEmpty()) {
 			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, 
@@ -57,16 +59,17 @@ public class UpdateUserInfo extends HttpServlet {
 			return;
 		}
 		
-		Timestamp birthday = new Timestamp(System.currentTimeMillis());
+		//Timestamp birthday = new Timestamp(System.currentTimeMillis());
+		Timestamp birthday = null;
 		try {
 			birthday = Timestamp.valueOf(birthdayStr);
 		} catch (Exception e) {
 			System.out.println("Error while parse " + birthdayStr + " to timestamp.");
-			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, ErrMsg.TIME_FORMAT_ERROR);
-			return;
+			//HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, ErrMsg.TIME_FORMAT_ERROR);
+			//return;
 		}
 		
-		UserInfo userInfo = BizUtil.updateUserInfo(uid, nickname, state, sex, birthday, selfIntroduction);
+		UserInfo userInfo = BizUtil.updateUserInfo(uid, nickname, state, sex, birthday, selfIntroduction, userIcon, background);
 		if (userInfo != null) {
 			HttpUtil.normalRespond(response, RetCode.SUCCESS, userInfo);
 		} else {

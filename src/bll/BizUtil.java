@@ -62,11 +62,11 @@ public class BizUtil {
 	public static UserInfo getUserInfo(long uid) {
 		
 		Account account = DBUtil.getUserInfo(uid);
-		
+				
 		UserInfo userInfo = null;
 		if (account != null) {
 			userInfo = new UserInfo(account.getUserId(), account.getRealName(), account.getTelephone(),
-					account.getPassword(), account.getNickname(), account.getUserIcon(), account.getRegTime(),
+					account.getPassword(), account.getNickname(), account.getUserIcon(), account.getBackground(), account.getRegTime(),
 					account.getSex(), account.getState(), account.getBirthday(), account.getSelfIntroduction());
 		}
 		
@@ -105,7 +105,7 @@ public class BizUtil {
 	 * @param selfIntroduction
 	 * @return updated user information if success; null otherwise
 	 */
-	public static UserInfo updateUserInfo(long uid, String nickname, String state, String sex, Timestamp birthday, String selfIntroduction) {
+	public static UserInfo updateUserInfo(long uid, String nickname, String state, String sex, Timestamp birthday, String selfIntroduction, String userIcon, String background) {
 		
 		Account account = new Account();
 		account.setUserId(uid);
@@ -114,6 +114,8 @@ public class BizUtil {
 		account.setSex(sex);
 		account.setBirthday(birthday);
 		account.setSelfIntroduction(selfIntroduction);
+		account.setUserIcon(userIcon);
+		account.setBackground(background);
 		
 		DBUtil.updateUserInfo(account);
 		

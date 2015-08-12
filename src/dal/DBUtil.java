@@ -145,7 +145,7 @@ public class DBUtil {
 		PreparedStatement stmt = null;
         
 		Connection conn = DBUtil.getConnection();
-		String sql = "select user_id, real_name, telephone, nickname, user_icon, reg_time, sex, state, birthday, self_introduction "+
+		String sql = "select user_id, real_name, telephone, nickname, user_icon, reg_time, sex, state, birthday, self_introduction, background "+
 				"from account where user_id = ?;";
 		
 		Account result = new Account();
@@ -166,6 +166,7 @@ public class DBUtil {
 				result.setState(rs.getString(8));
 				result.setBirthday(rs.getTimestamp(9));
 				result.setSelfIntroduction(rs.getString(10));
+				result.setBackground(rs.getString(11));				
 			}
 			else{
 				result = null;
@@ -225,7 +226,7 @@ public class DBUtil {
         
 		Connection conn = DBUtil.getConnection();
 		String sql = "update account "+
-				"set nickname = ? , state = ? , sex = ? , birthday = ? , self_introduction = ? "+
+				"set nickname = ? , state = ? , sex = ? , birthday = ? , self_introduction = ?, user_icon = ?, background = ? "+
 				"where user_id = ?;";
 		
 		try {
@@ -235,7 +236,9 @@ public class DBUtil {
 			stmt.setString(3, account.getSex());
 			stmt.setTimestamp(4, account.getBirthday());
 			stmt.setString(5, account.getSelfIntroduction());
-			stmt.setLong(6, account.getUserId());
+			stmt.setString(6, account.getUserIcon());
+			stmt.setString(7, account.getBackground());
+			stmt.setLong(8, account.getUserId());
 			
 			stmt.executeUpdate();
 			
