@@ -4,14 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
-import java.security.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -30,13 +28,25 @@ import bll.HttpUtil;
 public class UploadFile extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
+	private static enum FileType {
+		SITE, MINISITE, ACCOUNT, BACKGROUND
+	}
+	
 	private static int MAX_FILE_SIZE = 100 * 1024;
 	private static int MAX_MEM_SIZE = 50 * 1024;
 	
-	private String ROOT_IN_SERVER;
-	private String ROOT_IN_LOCAL;
-	private String TEMP_PATH = "data/temp/";
-	private String DATA_PATH = "data/picture/";
+	private String ROOT;
+	private static String TEMP_PATH = "data/temp/";
+	private static String SITE_PATH = "data/site/";
+	private static String MINISITE_PATH = "data/minisite/";
+	private static String ACCOUNT_PATH = "data/account/";
+	private static String BACKGROUND_PATH = "data/background/";
+	
+	private long uid;
+	private long siteId;
+	private long minisiteId;
+	private FileType type;
+	private FileItem fileItem;
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -46,12 +56,117 @@ public class UploadFile extends HttpServlet {
         // TODO Auto-generated constructor stub
     }
     
+    private String getRoot() {
+    	//return "/Users/Buffer/Documents/Code/eclipseEE workspace/huiwan/WebContent/";
+    	return this.getServletContext().getRealPath("/");
+    }
+    
     @Override
     public void init() {
-    	this.ROOT_IN_LOCAL = "/Users/Buffer/Documents/Code/eclipseEE workspace/huiwan/WebContent/";
-    	this.ROOT_IN_SERVER = this.getServletContext().getRealPath("/");
+    	this.ROOT = this.getRoot();
     }
 
+    private void initParas() {
+    	
+    	this.uid = -1;
+    	this.siteId = -1;
+    	this.minisiteId = -1;
+    	this.type = null;
+    	this.fileItem = null;
+    }
+    
+    private void parseFileParas(HttpServletRequest request) throws Exception{
+    	
+    	this.initParas();
+    	
+    	DiskFileItemFactory fileFactory = new DiskFileItemFactory();
+		fileFactory.setSizeThreshold(MAX_MEM_SIZE);
+		fileFactory.setRepository(
+				new File(this.ROOT + UploadFile.TEMP_PATH));
+		
+		ServletFileUpload upload = new ServletFileUpload(fileFactory);
+		upload.setSizeMax(MAX_FILE_SIZE);
+			
+		List<FileItem> fileItems = upload.parseRequest(request);
+		Iterator<FileItem> iter = fileItems.iterator();
+		
+		while(iter.hasNext()) {
+			FileItem item = (FileItem) iter.next();
+			if (!item.isFormField()) {
+				fileItem = item;
+			} else if (item.getFieldName().equals("uid")){
+				uid = Long.parseLong(item.getString());
+			} else if (item.getFieldName().equals("siteId")) {
+				siteId = Long.parseLong(item.getString());
+			} else if (item.getFieldName().equals("type")) {
+				type = FileType.valueOf(item.getString().toUpperCase());
+			} else if (item.getFieldName().equals("minisiteId")) {
+				minisiteId = Long.parseLong(item.getString());
+			}
+		}
+    }
+        
+    private String getFilePath() throws Exception {
+    	
+    	String path = null;
+    	switch(type) {
+    	case SITE:
+    		path = UploadFile.SITE_PATH + "id_" + siteId + "/";
+    		break;
+    	case MINISITE:
+    		path = UploadFile.MINISITE_PATH + "id_" + minisiteId + "/";
+    		break;
+    	case ACCOUNT:
+    		path = UploadFile.ACCOUNT_PATH;
+    		break;
+    	case BACKGROUND:
+    		path = UploadFile.BACKGROUND_PATH;
+    		break;
+    	}
+    	
+    	return path;
+    }
+    
+    private String getFileName() throws Exception{
+    	
+    	// Calculate MD5 according to fileName, time and user info
+    	String md5 = BizUtil.calcMd5(fileItem.getName(), uid, siteId);
+    	
+    	String fileName = null;
+    	switch(type) {
+    	case SITE:
+    	case MINISITE:
+    		fileName = md5 + "." + BizUtil.getExtensionName(fileItem.getName());
+    		break;
+    	case ACCOUNT:
+    	case BACKGROUND:
+    		fileName = "id_" + uid + "." + BizUtil.getExtensionName(fileItem.getName());
+    		break;
+    	}
+    	
+    	return fileName;
+    }
+    
+    private boolean checkParas() {
+    	
+    	if (fileItem == null || type == null || uid == -1) {
+    		return false;
+    	}
+    	
+    	switch(type) {
+    	case SITE:
+    		if (siteId == -1) return false;
+    		break;
+    	case MINISITE:
+    		if (minisiteId == -1) return false;
+    		break;
+		default:
+			break;
+    	}
+    	
+    	return true;
+    }
+    
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -59,49 +174,24 @@ public class UploadFile extends HttpServlet {
 		
 		boolean isMultipart = ServletFileUpload.isMultipartContent(request);
 		
+		// check whether the request is multipart
 		if (!isMultipart) {
 			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, 
 					ErrMsg.NO_FILE_TO_UPLOAD);
 		}
 		
-		DiskFileItemFactory fileFactory = new DiskFileItemFactory();
-		fileFactory.setSizeThreshold(MAX_MEM_SIZE);
-		fileFactory.setRepository(
-				new File(this.ROOT_IN_SERVER + this.TEMP_PATH));
-		
-		ServletFileUpload upload = new ServletFileUpload(fileFactory);
-		upload.setSizeMax(MAX_FILE_SIZE);
-			
-		long uid = -1, siteId = -1;
-		String type = "";
-		FileItem fileItem = null;
-		UploadInfoList uploadInfoList = new UploadInfoList();
+		// parse parameters in the request, return bad request if failed
 		try {
-			List<FileItem> fileItems = upload.parseRequest(request);
-			Iterator<FileItem> iter = fileItems.iterator();
-			
-			while(iter.hasNext()) {
-				FileItem item = (FileItem) iter.next();
-				if (!item.isFormField()) {
-					fileItem = item;
-				} else if (item.getFieldName().equals("uid")){
-					uid = Long.parseLong(item.getString());
-				} else if (item.getFieldName().equals("siteId")) {
-					siteId = Long.parseLong(item.getString());
-				} else if (item.getFieldName().equals("type")) {
-					type = item.getString();
-				} else if (item.getFieldName().equals("minisiteId")) {
-					
-				}
-			}
+			parseFileParas(request);
 		} catch (Exception e) {
 			System.out.println("Error while parsing request.");
 			System.err.println(e);
 			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, ErrMsg.UPLOAD_FILE_ERROR);
 			return;
 		}
-		
-		if (fileItem == null ||uid == -1 || siteId == -1 || (!type.equals("site") && !type.equals("minisite"))) {
+	
+		UploadInfoList uploadInfoList = new UploadInfoList();
+		if (!this.checkParas()) {
 			HttpUtil.errorRespond(response, RetCode.BAD_REQUEST, ErrMsg.UPLOAD_FILE_ERROR);
 		}
 		
@@ -113,19 +203,16 @@ public class UploadFile extends HttpServlet {
 		long sizeInBytes = fileItem.getSize();
 							
 		try {
-			File dir = new File(this.ROOT_IN_SERVER + this.DATA_PATH + "id_" + siteId);
+			File dir = new File(this.ROOT + this.getFilePath());
 			if (!dir.exists() && !dir.isDirectory()) {
 				dir.mkdir();
-			}
-			
-			// Calculate MD5 according to fileName, time and user info
-			String md5 = BizUtil.calcMd5(fileName, uid, siteId);
+			}		
 			
 			// Write file
-			File file = new File(dir+ "/" + md5 + "." + BizUtil.getExtensionName(fileName));
+			File file = new File(dir.getAbsolutePath() + "/" + this.getFileName());
 			fileItem.write(file);					
 			
-			uploadInfoList.addUploadInfo(fileName, this.DATA_PATH + "id_" + siteId + "/" + file.getName());
+			uploadInfoList.addUploadInfo(fileName, this.getFilePath() + this.getFileName());
 		} catch (Exception e) {
 			System.out.println("Error while writing file.");
 			System.err.println(e);
