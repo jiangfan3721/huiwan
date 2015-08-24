@@ -394,7 +394,7 @@ public class DBUtil {
 	 * @param offset
 	 * @return ArrayList of Long which contains all site_id in city_id
 	 */
-	public static ArrayList<Long> getSiteList(long cityId, long size, long offset){
+	public static ArrayList<Long> getSiteList(long cityId, long size, long offset) {
 
 		PreparedStatement stmt = null;
         
@@ -421,6 +421,44 @@ public class DBUtil {
 			
 		} catch (SQLException e) {
 			System.out.println("Something error in getSiteList");
+		}
+		return result;
+	}
+	
+	/**
+	 * 
+	 * @param siteId
+	 * @param size
+	 * @param offset
+	 * @return ArrayList of Long which contains all minisiteId in siteId
+	 */
+	public static ArrayList<Long> getMinisiteList(long siteId, long size, long offset) {
+		
+		PreparedStatement stmt = null;
+        
+		Connection conn = DBUtil.getConnection();
+		String sql = "select Minisite_id from minisite "+
+					"where Site_site_id = ? " +
+					"limit ?, ?;";
+		
+		ArrayList<Long> result = new ArrayList<Long>();
+		
+		try {
+			stmt = conn.prepareStatement(sql);
+			stmt.setLong(1, siteId);
+			stmt.setLong(2, offset);
+			stmt.setLong(3, size);
+			
+			ResultSet rs = stmt.executeQuery();
+			
+			while(rs.next()) {
+				result.add(rs.getLong(1));
+			}
+			
+			DBUtil.close(conn, stmt, rs);
+			
+		} catch (SQLException e) {
+			System.out.println("Something error in getMinisiteList");
 		}
 		return result;
 	}

@@ -186,6 +186,16 @@ public class BizUtil {
 		return siteList;
 	}
 	
+	public static MinisiteIdList getMinisiteList(long siteId, long size, long offset) {
+		
+		ArrayList<Long> list = DBUtil.getMinisiteList(siteId, size, offset);
+		
+		MinisiteIdList minisiteList = new MinisiteIdList();
+		minisiteList.setMinisiteIdList(list);
+		
+		return minisiteList;
+	}
+	
 	/**
 	 *
 	 * @param siteIds

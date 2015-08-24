@@ -57,8 +57,8 @@ public class UploadFile extends HttpServlet {
     }
     
     private String getRoot() {
-    	//return "/Users/Buffer/Documents/Code/eclipseEE workspace/huiwan/WebContent/";
-    	return this.getServletContext().getRealPath("/");
+    	return "/Users/Buffer/Documents/Code/eclipseEE workspace/huiwan/WebContent/";
+    	//return this.getServletContext().getRealPath("/");
     }
     
     @Override
@@ -129,13 +129,12 @@ public class UploadFile extends HttpServlet {
     
     private String getFileName() throws Exception{
     	
-    	// Calculate MD5 according to fileName, time and user info
-    	String md5 = BizUtil.calcMd5(fileItem.getName(), uid, siteId);
-    	
     	String fileName = null;
     	switch(type) {
     	case SITE:
     	case MINISITE:
+    		// Calculate MD5 according to fileName, time and user info
+        	String md5 = BizUtil.calcMd5(fileItem.getName(), uid, siteId);
     		fileName = md5 + "." + BizUtil.getExtensionName(fileItem.getName());
     		break;
     	case ACCOUNT:
@@ -212,7 +211,7 @@ public class UploadFile extends HttpServlet {
 			File file = new File(dir.getAbsolutePath() + "/" + this.getFileName());
 			fileItem.write(file);					
 			
-			uploadInfoList.addUploadInfo(fileName, this.getFilePath() + this.getFileName());
+			uploadInfoList.addUploadInfo(fileName, this.getFilePath() + file.getName());
 		} catch (Exception e) {
 			System.out.println("Error while writing file.");
 			System.err.println(e);
