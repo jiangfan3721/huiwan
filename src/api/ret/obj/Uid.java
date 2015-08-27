@@ -2,7 +2,7 @@ package api.ret.obj;
 
 public class Uid extends RetObjBase {
 	
-	private long uid;
+	private long uid = -1;
 
 	public long getUid() {
 		return uid;

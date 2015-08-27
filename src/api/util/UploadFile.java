@@ -57,8 +57,8 @@ public class UploadFile extends HttpServlet {
     }
     
     private String getRoot() {
-    	return "/Users/Buffer/Documents/Code/eclipseEE workspace/huiwan/WebContent/";
-    	//return this.getServletContext().getRealPath("/");
+    	//return "/Users/Buffer/Documents/Code/eclipseEE workspace/huiwan/WebContent/";
+    	return this.getServletContext().getRealPath("/");
     }
     
     @Override

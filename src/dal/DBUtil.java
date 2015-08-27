@@ -1353,7 +1353,7 @@ public class DBUtil {
 	 * @param offset
 	 * @return ArrayList of Long which contains all site_id in city_id
 	 */
-	public static ArrayList<Long> getSiteListByUserId(long userId, long size, long offset){
+	public static ArrayList<Long> getSiteListByUserId(long userId, long size, long offset) {
 
 		PreparedStatement stmt = null;
         
@@ -1382,5 +1382,123 @@ public class DBUtil {
 			System.out.println("Something error in getSiteList");
 		}
 		return result;
+	}
+	
+	/**
+	 * 
+	 * @param siteId
+	 * @return comments number of the site
+	 */
+	public static int getSiteCommentsNumber(long siteId) {
+		
+		PreparedStatement stmt = null;
+        
+		Connection conn = DBUtil.getConnection();
+		String sql = "select count(commentsForSite_id) from commentsforsite " +
+					"where Site_site_id = ?;";
+		
+		int commentNumber = -1;
+		try {
+			stmt = conn.prepareStatement(sql);
+			stmt.setLong(1, siteId);
+			
+			ResultSet rs = stmt.executeQuery();
+			
+			if (rs.next()){
+				commentNumber = rs.getInt(1);
+				DBUtil.close(conn, stmt, rs);
+				return commentNumber;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return commentNumber;
+	}
+	
+	/**
+	 * 
+	 * @param minisiteId
+	 * @return comments number of the minisite
+	 */
+	public static int getMinisiteCommentsNumber(long minisiteId) {
+		
+		PreparedStatement stmt = null;
+		
+		Connection conn = DBUtil.getConnection();
+		String sql = "select count(commentsForMinisite_id) from commentsforminisite " +
+				"where Minisite_minisite_id = ?;";
+		
+		int commentNumber = -1;
+		try {
+			stmt = conn.prepareStatement(sql);
+			stmt.setLong(1, minisiteId);
+			
+			ResultSet rs = stmt.executeQuery();
+			
+			if (rs.next()){
+				commentNumber = rs.getInt(1);
+				DBUtil.close(conn, stmt, rs);
+				return commentNumber;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return commentNumber;
+	}
+	
+	public static int getUsersNumberOfSite(long siteId) {
+		
+		PreparedStatement stmt = null;
+		
+		Connection conn = DBUtil.getConnection();
+		String sql = "select count(distinct Account_user_id) from commentsforsite "
+				+ "where Site_site_id = ?";
+		
+		int userNumber = -1;
+		try {
+			stmt = conn.prepareStatement(sql);
+			stmt.setLong(1, siteId);
+			
+			ResultSet rs = stmt.executeQuery();
+			
+			if (rs.next()) {
+				userNumber = rs.getInt(1);
+				DBUtil.close(conn, stmt, rs);
+				return userNumber;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return userNumber;
+	}
+	
+	public static int getUsersNumberOfMinisite(long minisiteId) {
+		
+		PreparedStatement stmt = null;
+		
+		Connection conn = DBUtil.getConnection();
+		String sql = "select count(distinct Account_user_id) from commentsforminisite "
+				+ "where Minisite_minisite_id = ?";
+		
+		int userNumber = -1;
+		try {
+			stmt = conn.prepareStatement(sql);
+			stmt.setLong(1, minisiteId);
+			
+			ResultSet rs = stmt.executeQuery();
+			
+			if (rs.next()) {
+				userNumber = rs.getInt(1);
+				DBUtil.close(conn, stmt, rs);
+				return userNumber;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return userNumber;
 	}
 }

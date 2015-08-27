@@ -8,17 +8,18 @@ import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 
 import api.ret.obj.CityIdList;
 import api.ret.obj.CityInfoList;
+import api.ret.obj.CommentsNumber;
 import api.ret.obj.MinisiteCommentList;
 import api.ret.obj.MinisiteInfoList;
 import api.ret.obj.PictureForMinisiteList;
 import api.ret.obj.PictureForSiteList;
-import api.ret.obj.PicturePathList;
 import api.ret.obj.MinisiteIdList;
 import api.ret.obj.SiteCommentList;
 import api.ret.obj.SiteInfoList;
 import api.ret.obj.SiteIdList;
 import api.ret.obj.Uid;
 import api.ret.obj.UserInfo;
+import api.ret.obj.UsersNumber;
 import dal.DBUtil;
 import entity.Account;
 import entity.City;
@@ -473,6 +474,58 @@ public class BizUtil {
 		return siteList;	
 	}
 	
+	/**
+	 * 
+	 * @param siteId
+	 * @return comments number of the site
+	 */
+	public static CommentsNumber getSiteCommentsNumber(long siteId) {
+		
+		int n = DBUtil.getSiteCommentsNumber(siteId);
+		CommentsNumber commentsNumber = new CommentsNumber(n);
+		
+		return commentsNumber;
+	}
+	
+	/**
+	 * 
+	 * @param minisiteId
+	 * @return comments number of the minisite
+	 */
+	public static CommentsNumber getMinisiteCommentsNumber(long minisiteId) {
+		
+		int n = DBUtil.getMinisiteCommentsNumber(minisiteId);
+		CommentsNumber commentsNumber = new CommentsNumber(n);
+		
+		return commentsNumber;
+	}
+	
+	/**
+	 * 
+	 * @param siteId
+	 * @return number of users that has visited the site
+	 */
+	public static UsersNumber getUsersNumberOfSite(long siteId) {
+		
+		int n = DBUtil.getUsersNumberOfSite(siteId);
+		UsersNumber usersNumber = new UsersNumber(n);
+		
+		return usersNumber;
+	}
+	
+	/**
+	 * 
+	 * @param minisiteId
+	 * @return number of users that has visited the minisite
+	 */
+	public static UsersNumber getUsersNumberOfMinisite(long minisiteId) {
+		
+		int n = DBUtil.getUsersNumberOfMinisite(minisiteId);
+		UsersNumber usersNumber = new UsersNumber(n);
+		
+		return usersNumber;
+	}
+	
 	public static String calcMd5(String fileName, long uid, long siteId) throws Exception {
 		
 		String uploadInfo = fileName + uid + siteId + System.currentTimeMillis();
@@ -492,5 +545,5 @@ public class BizUtil {
             }   
         }   
         return filename;   
-    } 
+    }
 }
