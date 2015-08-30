@@ -5,30 +5,30 @@ import java.util.Date;
 
 public class PictureForSite {
 	
-	private long pictureForSiteId;
+	private long id;
 	private String picPath;
-	private long commentForSiteId;
+	private long siteCommentId;
 	private long userId;
 	private long siteId;
 	private float size;
 	private Timestamp time;
 	
 	public PictureForSite(){
-		this.pictureForSiteId = -1;
+		this.id = -1;
 		this.picPath = "";
-		this.commentForSiteId = -1;
+		this.siteCommentId = -1;
 		this.userId = -1;
 		this.siteId = -1;
 		this.size = -1;
 		this.time = new Timestamp(0);
 	}
 
-	public long getPictureForSiteId() {
-		return pictureForSiteId;
+	public long getId() {
+		return id;
 	}
 
-	public void setPictureForSiteId(long pictureForSiteId) {
-		this.pictureForSiteId = pictureForSiteId;
+	public void setId(long id) {
+		this.id = id;
 	}
 
 	public String getPicPath() {
@@ -39,12 +39,12 @@ public class PictureForSite {
 		this.picPath = picPath;
 	}
 
-	public long getCommentForSiteId() {
-		return commentForSiteId;
+	public long getSiteCommentId() {
+		return siteCommentId;
 	}
 
-	public void setCommentForSiteId(long commentForSiteId) {
-		this.commentForSiteId = commentForSiteId;
+	public void setSiteCommentId(long siteCommentId) {
+		this.siteCommentId = siteCommentId;
 	}
 
 	public long getUserId() {

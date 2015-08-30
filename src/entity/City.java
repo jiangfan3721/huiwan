@@ -2,7 +2,7 @@ package entity;
 
 public class City {
 
-	private long city_id;
+	private long id;
 	private String name;
 	private String citySketch;
 	private String cityInformation;
@@ -10,7 +10,7 @@ public class City {
 	private String picPath;
 	
 	public City(){
-		this.city_id = -1;
+		this.id = -1;
 		this.name = "";
 		this.citySketch = "";
 		this.cityInformation = "";
@@ -18,12 +18,12 @@ public class City {
 		this.picPath = "";
 	}
 
-	public long getCity_id() {
-		return city_id;
+	public long getId() {
+		return id;
 	}
 
-	public void setCity_id(long city_id) {
-		this.city_id = city_id;
+	public void setId(long id) {
+		this.id = id;
 	}
 
 	public String getName() {

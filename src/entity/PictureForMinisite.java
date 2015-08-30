@@ -5,30 +5,30 @@ import java.util.Date;
 
 public class PictureForMinisite {
 	
-	private long pictureForMinisite;
+	private long id;
 	private String picPath;
-	private long commentForMinisiteId;
+	private long minisiteCommentId;
 	private long userId;
 	private long minisiteId;
 	private float size;
 	private Timestamp time;
 	
 	public PictureForMinisite(){
-		this.pictureForMinisite = -1;
+		this.id = -1;
 		this.picPath = "";
-		this.commentForMinisiteId = -1;
+		this.minisiteCommentId = -1;
 		this.userId = -1;
 		this.minisiteId = -1;
 		this.size = -1;
 		this.time = new Timestamp(0);
 	}
 
-	public long getPictureForMinisite() {
-		return pictureForMinisite;
+	public long getId() {
+		return id;
 	}
 
-	public void setPictureForMinisite(long pictureForMinisite) {
-		this.pictureForMinisite = pictureForMinisite;
+	public void setId(long id) {
+		this.id = id;
 	}
 
 	public String getPicPath() {
@@ -39,12 +39,12 @@ public class PictureForMinisite {
 		this.picPath = picPath;
 	}
 
-	public long getCommentForMinisiteId() {
-		return commentForMinisiteId;
+	public long getMinisiteCommentId() {
+		return minisiteCommentId;
 	}
 
-	public void setCommentForMinisiteId(long commentForMinisiteId) {
-		this.commentForMinisiteId = commentForMinisiteId;
+	public void setMinisiteCommentId(long minisiteCommentId) {
+		this.minisiteCommentId = minisiteCommentId;
 	}
 
 	public long getUserId() {
@@ -78,6 +78,5 @@ public class PictureForMinisite {
 	public void setTime(Timestamp time) {
 		this.time = time;
 	}
-	
 
 }
