@@ -5,7 +5,7 @@ import java.util.Date;
 
 public class Site {
 	
-	private long siteId;
+	private long id;
 	private String name;
 	private String logoPath;
 	private String imgPath;
@@ -19,7 +19,7 @@ public class Site {
 	private String englishName;
 	
 	public Site() {
-		this.siteId = -1;
+		this.id = -1;
 		this.name = "";
 		this.logoPath = "";
 		this.imgPath = "";
@@ -33,12 +33,12 @@ public class Site {
 		this.englishName = "";
 	}
 
-	public long getSiteId() {
-		return siteId;
+	public long getId() {
+		return id;
 	}
 
-	public void setSiteId(long siteId) {
-		this.siteId = siteId;
+	public void setId(long id) {
+		this.id = id;
 	}
 
 	public String getName() {

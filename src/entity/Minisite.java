@@ -6,7 +6,7 @@ import java.util.Date;
 
 public class Minisite {
 
-	private long minisiteId;
+	private long id;
 	private long siteId;
 	private String name;
 	private String logoPath;
@@ -16,11 +16,11 @@ public class Minisite {
 	private float coorsY;
 	private String keyValue;
 	private String musicPath;
-	private String ircPath;
+	private String lrcPath;
 	private String englishName;
 	
 	public Minisite(){
-		this.minisiteId = -1;
+		this.id = -1;
 		this.siteId = -1;
 		this.name = "";
 		this.logoPath = "";
@@ -29,17 +29,17 @@ public class Minisite {
 		this.coorsX = 0.0f;
 		this.coorsY = 0.0f;
 		this.keyValue = "";
-		this.ircPath = "";
+		this.lrcPath = "";
 		this.musicPath = "";
 		this.englishName = "";
 	}
 
-	public long getMinisiteId() {
-		return minisiteId;
+	public long getId() {
+		return id;
 	}
 
-	public void setMinisiteId(long minisiteId) {
-		this.minisiteId = minisiteId;
+	public void setId(long id) {
+		this.id = id;
 	}
 
 	public long getSiteId() {
@@ -114,12 +114,12 @@ public class Minisite {
 		this.musicPath = musicPath;
 	}
 
-	public String getIrcPath() {
-		return ircPath;
+	public String getLrcPath() {
+		return lrcPath;
 	}
 
-	public void setIrcPath(String ircPath) {
-		this.ircPath = ircPath;
+	public void setLrcPath(String lrcPath) {
+		this.lrcPath = lrcPath;
 	}
 
 	public String getEnglishName() {
